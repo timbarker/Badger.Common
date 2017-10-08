@@ -4,107 +4,6 @@ using System;
 
 namespace Badger.Common.Tests
 {
-    public class GivenAnOptional
-    {
-        public class WhenConstructingWithANonNullReference
-        {
-            private readonly Optional<string> optional;
-
-            public WhenConstructingWithANonNullReference()
-            {
-                optional = new Optional<string>("Hello");
-            }
-
-            [Fact]
-            public void ThenTheValueIsCorrect()
-            {
-                optional.Value.Should().Be("Hello");
-            }
-
-            [Fact]
-            public void ThenTheOptionalHasAValue()
-            {
-                optional.HasValue.Should().BeTrue();
-            }
-        }
-
-        public class WhenConstructingWithANonNullValue
-        {
-            private readonly Optional<int?> optional;
-
-            public WhenConstructingWithANonNullValue()
-            {
-                optional = new Optional<int?>(42);
-            }
-
-            [Fact]
-            public void ThenTheValueIsCorrect()
-            {
-                optional.Value.Should().Be(42);
-            }
-
-            [Fact]
-            public void ThenTheOptionalHasAValue()
-            {
-                optional.HasValue.Should().BeTrue();
-            }
-        }
-
-        public class WhenConstructingWithValue
-        {
-            private readonly Optional<int> optional;
-
-            public WhenConstructingWithValue()
-            {
-                optional = new Optional<int>(42);
-            }
-
-            [Fact]
-            public void ThenTheValueIsCorrect()
-            {
-                optional.Value.Should().Be(42);
-            }
-
-            [Fact]
-            public void ThenTheOptionalHasAValue()
-            {
-                optional.HasValue.Should().BeTrue();
-            }
-        }
-
-        public class WhenConstructingWithANullReference
-        {
-            private readonly Optional<string> optional;
-
-            public WhenConstructingWithANullReference()
-            {
-                optional = new Optional<string>(null);
-            }
-
-            [Fact]
-            public void ThenTheOptionalShouldNotHaveAValue()
-            {
-                optional.HasValue.Should().BeFalse();
-            }
-        }
-
-        public class WhenConstructingWithANullValue
-        {
-            private readonly Optional<int?> optional;
-
-            public WhenConstructingWithANullValue()
-            {
-                optional = new Optional<int?>(null);
-            }
-
-            [Fact]
-            public void ThenTheOptionalShouldNotHaveAValue()
-            {
-                optional.HasValue.Should().BeFalse();
-            }
-        }
-    }
-
     public class GivenANonNullNullable
     {
         public class WhenConvertingToAnOptional
@@ -389,7 +288,7 @@ namespace Badger.Common.Tests
             public void ThenTheValueShouldBeCorrect()
             {
                 var ex = Assert.Throws<InvalidOperationException>(() => optional.Value);
-                ex.Message.Should().Be("Optional does not have a value");
+                ex.Message.Should().Be("None does not have a value");
             }
 
             [Fact]

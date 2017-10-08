@@ -35,7 +35,7 @@ var result = Divide(100, 2);
 // returns the result or 0 if result is None
 result.ValueOr(0); 
 
-// multiplies the result by 100 only result is not None
+// multiplies the result by 100 only if result is not None
 result.Map(v => v * 100); 
 
 // calls Divide again only if result is not None
@@ -59,4 +59,36 @@ from v1 in Divide(100, 2)
 from v2 in Divide(500, v1)
 where v2 > 5
 select v2 * 2; 
+```
+
+## Result
+Wraps a Success value or an Error value
+
+```csharp
+Result<int, string> SomethingThatCouldFail(int someData)
+{
+    try 
+    {
+        // lets pretend this could fail sometimes
+        return Result.Ok<int, string>(42);
+    }
+    catch (Exception ex)
+    {
+        return Result.Error<int, string>(ex.Message);
+    }
+}
+
+var result = SomethingThatCouldFail(200);
+
+// multiplies the result by 100 only if result is Success
+result.Map(r => r * 2);
+
+// calls SomethingThatCouldFail again only if result is Success
+result.FlatMap(r => SomethingThatCouldFail(r));
+
+// changes the error string to "Whoops" if result is an Error
+result.MapError(e => "Whoops");
+
+// returns the success value or throws (only if TError is an exception)
+result.SuccessOrThrow();
 ```
