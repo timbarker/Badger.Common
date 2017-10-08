@@ -1,2 +1,2 @@
-# Badger.Core
+# Badger.Common
 Set of useful C# utilities
