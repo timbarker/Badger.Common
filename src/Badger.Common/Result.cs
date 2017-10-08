@@ -51,6 +51,11 @@ namespace Badger.Common
             public override TSuccess Success { get; }
 
             public override TError Error => throw new InvalidOperationException("Error value not available on Success");
+
+            public override string ToString()
+            {
+                return $"Success{Success})";
+            }
         }
 
         private sealed class ErrorResult<TSuccess, TError> : Result<TSuccess, TError>
@@ -67,6 +72,11 @@ namespace Badger.Common
             public override TSuccess Success => throw new InvalidOperationException("Success value not available on Erorr");
 
             public override TError Error { get; }
+
+            public override string ToString()
+            {
+                return $"Error{Error})";
+            }
         }
     }
 }
