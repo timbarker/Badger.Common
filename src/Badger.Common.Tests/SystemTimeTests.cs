@@ -45,7 +45,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheTimeIsFrozen()
             {
-                SystemTime.UtcNow.Should().BeCloseTo(frozenTime);
+                SystemTime.UtcNow.Should().BeCloseTo(frozenTime, precision: 1000);
             }
         }
     }
@@ -66,7 +66,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheTimeIsUnfrozen()
             {
-                SystemTime.UtcNow.Should().BeCloseTo(DateTime.UtcNow);
+                SystemTime.UtcNow.Should().BeCloseTo(DateTime.UtcNow, precision: 1000);
             }
         }
 
