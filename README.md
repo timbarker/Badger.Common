@@ -70,7 +70,7 @@ Result<int, string> SomethingThatCouldFail(int someData)
     try 
     {
         // lets pretend this could fail sometimes
-        return Result.Ok<int, string>(42);
+        return Result.Ok<int, string>(someData * 2);
     }
     catch (Exception ex)
     {
