@@ -1,0 +1,11 @@
+language: csharp
+mono: none
+dotnet: 2.0.0
+dist: trusty
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+script:
+  - dotnet build src/Badger.Common.sln
+  - dotnet test src/Badger.Common.Tests/Badger.Common.Tests.csproj
