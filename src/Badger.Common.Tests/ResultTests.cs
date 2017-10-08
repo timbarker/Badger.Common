@@ -154,6 +154,56 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenInvokingWhenSuccess
+        {
+            private readonly Result<int, string> result;
+
+            public WhenInvokingWhenSuccess()
+            {
+                result = Result.Ok<int, string>(42);
+            }
+
+            [Fact]
+            public void ThenTheActionShouldBeInvoked()
+            {
+                int invokedArg = 0;
+                result.WhenSuccess(s => invokedArg = s);
+
+                invokedArg.Should().Be(42);
+            }
+
+            [Fact]
+            public void TheReturnedResultShouldBeTheSame()
+            {
+                result.WhenSuccess(_ => { }).Should().BeSameAs(result);
+            }
+        }
+
+        public class WhenInvokingWhenError
+        {
+            private readonly Result<int, string> result;
+
+            public WhenInvokingWhenError()
+            {
+                result = Result.Ok<int, string>(42);
+            }
+
+            [Fact]
+            public void ThenTheActionShouldNotBeInvoked()
+            {
+                bool invoked = false;
+                result.WhenError(_ => invoked = true);
+
+                invoked.Should().BeFalse();
+            }
+
+            [Fact]
+            public void TheReturnedResultShouldBeTheSame()
+            {
+                result.WhenError(_ => { }).Should().BeSameAs(result);
+            }
+        }
+
         public class WhenSuccessOrThrow
         {
             private readonly Result<int, Exception> result;
@@ -369,6 +419,56 @@ namespace Badger.Common.Tests
             public void ThenTheResultShouldBeError()
             {
                 result.IsError.Should().BeTrue();
+            }
+        }
+
+        public class WhenInvokingWhenSuccess
+        {
+            private readonly Result<int, string> result;
+
+            public WhenInvokingWhenSuccess()
+            {
+                result = Result.Error<int, string>("Borked");
+            }
+
+            [Fact]
+            public void ThenTheActionShouldNotBeInvoked()
+            {
+                bool invoked = false;
+                result.WhenSuccess(_ => invoked = true);
+
+                invoked.Should().BeFalse();
+            }
+
+            [Fact]
+            public void TheReturnedResultShouldBeTheSame()
+            {
+                result.WhenSuccess(_ => { }).Should().BeSameAs(result);
+            }
+        }
+
+        public class WhenInvokingWhenError
+        {
+            private readonly Result<int, string> result;
+
+            public WhenInvokingWhenError()
+            {
+                result = Result.Error<int, string>("Borked");
+            }
+
+            [Fact]
+            public void ThenTheActionShouldBeInvoked()
+            {
+                string invokedArg = "";
+                result.WhenError(e => invokedArg = e);
+
+                invokedArg.Should().Be("Borked");
+            }
+
+            [Fact]
+            public void TheReturnedResultShouldBeTheSame()
+            {
+                result.WhenError(_ => { }).Should().BeSameAs(result);
             }
         }
 

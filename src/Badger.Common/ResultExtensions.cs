@@ -19,6 +19,20 @@ namespace Badger.Common
             return result.IsError ? Result.Error<TSuccess, TMapError>(mapper(result.Error)) : Result.Ok<TSuccess, TMapError>(result.Success);
         } 
 
+        public static Result<TSuccess, TError> WhenSuccess<TSuccess, TError>(this Result<TSuccess, TError> result, Action<TSuccess> action) 
+        {
+            if (result.IsSuccess) action(result.Success);
+
+            return result;
+        }
+
+        public static Result<TSuccess, TError> WhenError<TSuccess, TError>(this Result<TSuccess, TError> result, Action<TError> action) 
+        {
+            if (result.IsError) action(result.Error);
+
+            return result;
+        }
+
         public static TSuccess SuccessOrThrow<TSuccess, TError>(this Result<TSuccess, TError> result) where TError : Exception
         {
             if (result.IsError) throw result.Error;

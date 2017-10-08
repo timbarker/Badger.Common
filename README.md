@@ -44,6 +44,12 @@ result.FlatMap(v => Divide(250, v));
 // returns Some only if the predicate holds true and result is not None, else it results None
 result.Filter(v => v % 2 == 0); 
 
+// invokes the action supplied if the result is not None
+result.WhenSome(r => Console.WriteLine(r));
+
+// invokes the action supplied if the result is None
+result.WhenNone(() => Console.WriteLine("None"))
+
 // converts to nullable type (for value types only)
 result.ToNullable(); 
 
@@ -88,6 +94,12 @@ result.FlatMap(r => SomethingThatCouldFail(r));
 
 // changes the error string to "Whoops" if result is an Error
 result.MapError(e => "Whoops");
+
+// invokes the supplied action if the result is Success
+result.WhenSuccess(s => Console.WriteLine(s));
+
+// invokes the supplied action if the result is an Error
+result.WhenError(e => Console.WriteLine(e));
 
 // returns the success value or throws (only if TError is an exception)
 result.SuccessOrThrow();

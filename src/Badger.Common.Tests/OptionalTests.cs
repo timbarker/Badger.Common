@@ -172,6 +172,56 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenInvokingWhenSome
+        {
+            private readonly Optional<int> optional;
+
+            public WhenInvokingWhenSome()
+            {
+                optional = Optional.Some(42);
+            }
+
+            [Fact]
+            public void ThenTheActionIsInvoked()
+            {
+                int invokedArg = 0;
+                optional.WhenSome(v => invokedArg = v);
+
+                invokedArg.Should().Be(42);
+            }
+
+            [Fact]
+            public void TheReturnedOptionShouldBeTheSame()
+            {
+                optional.WhenSome(_ => {}).Should().BeSameAs(optional);
+            }
+        }
+
+        public class WhenInvokingWhenNone
+        {
+            private readonly Optional<int> optional;
+
+            public WhenInvokingWhenNone()
+            {
+                optional = Optional.Some(42);
+            }
+
+            [Fact]
+            public void ThenTheActionIsNotInvoked()
+            {
+                bool invoked = false;
+                optional.WhenNone(() => invoked = true);
+
+                invoked.Should().BeFalse();
+            }
+
+            [Fact]
+            public void TheReturnedOptionShouldBeTheSame()
+            {
+                optional.WhenNone(() => {}).Should().BeSameAs(optional);
+            }
+        }
+
         public class WhenConvertingToNullable
         {
             private readonly int? result;
@@ -376,6 +426,56 @@ namespace Badger.Common.Tests
             public void ThenTheFilterResultShouldBeCorrect()
             {
                 result.HasValue.Should().BeFalse();
+            }
+        }
+
+        public class WhenInvokingWhenSome
+        {
+            private readonly Optional<int> optional;
+
+            public WhenInvokingWhenSome()
+            {
+                optional = Optional.None<int>();
+            }
+
+            [Fact]
+            public void ThenTheActionIsNotInvoked()
+            {
+                bool invoked = false;
+                optional.WhenSome(v => invoked = true);
+
+                invoked.Should().BeFalse();
+            }
+
+            [Fact]
+            public void TheReturnedOptionShouldBeTheSame()
+            {
+                optional.WhenSome(_ => {}).Should().BeSameAs(optional);
+            }
+        }
+
+        public class WhenInvokingWhenNone
+        {
+            private readonly Optional<int> optional;
+
+            public WhenInvokingWhenNone()
+            {
+                optional = Optional.None<int>();
+            }
+
+            [Fact]
+            public void ThenTheActionIsInvoked()
+            {
+                bool invoked = false;
+                optional.WhenNone(() => invoked = true);
+
+                invoked.Should().BeTrue();
+            }
+
+            [Fact]
+            public void TheReturnedOptionShouldBeTheSame()
+            {
+                optional.WhenNone(() => {}).Should().BeSameAs(optional);
             }
         }
 

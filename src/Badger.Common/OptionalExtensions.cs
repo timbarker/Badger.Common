@@ -31,6 +31,20 @@ namespace Badger.Common
             return optional.FlatMap(t => filter(t) ? Optional.Some(t) : Optional.None<T>());
         }
 
+        public static Optional<T> WhenSome<T>(this Optional<T> optional, Action<T> action)
+        {
+            if (optional.HasValue) action(optional.Value);
+            
+            return optional;
+        }
+
+        public static Optional<T> WhenNone<T>(this Optional<T> optional, Action action)
+        {
+            if (!optional.HasValue) action();
+
+            return optional;
+        }
+
         public static T? ToNullable<T>(this Optional<T> optional) where T : struct
         {
             if (optional.HasValue) return optional.Value;
