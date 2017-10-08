@@ -5,6 +5,30 @@ using Badger.Common.Linq;
 
 namespace Badger.Common.Tests
 {
+    static class ResultTestHelperExtensions
+    {
+        public static void AssertSuccess<TSuccess, TError>(this Result<TSuccess, TError> result, TSuccess success)
+        {
+            result
+                .WhenSuccess(s => s.Should().Be(success))
+                .WhenError(e => Assert.True(false, $"expected success: {success} but got error: {e}"));
+        }
+
+        public static void AssertError<TSuccess, TError>(this Result<TSuccess, TError> result, TError error)
+        {
+            result
+                .WhenError(e => e.Should().Be(error))
+                .WhenSuccess(s => Assert.True(false, $"expected error: {error} but got success: {s}"));
+        }
+
+        public static void AssertError<TSuccess, TError>(this Result<TSuccess, TError> result, Predicate<TError> errorCheck)
+        {
+            result
+               .WhenError(e => errorCheck(e).Should().BeTrue())
+               .WhenSuccess(s => Assert.True(false, $"expected error but got success: {s}"));
+        }
+    }
+
     public class GivenASuccess
     {
         public class WhenResultOk
@@ -14,20 +38,6 @@ namespace Badger.Common.Tests
             public WhenResultOk()
             {
                 result = Result.Ok<int, string>(42);
-            }
-
-            [Fact]
-            public void ThenTheSuccessIsCorrect()
-            {
-                result.Success.Should().Be(42);
-            }
-
-            [Fact]
-            public void ThenTheErrorThrows()
-            {
-                var ex = Assert.Throws<InvalidOperationException>(() => result.Error);
-
-                ex.Message.Should().Be("Error value not available on Success");
             }
 
             [Fact]
@@ -55,7 +65,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFlatMapResultIsCorrect()
             {
-                result.Success.Should().Be(84);
+                result.AssertSuccess(84);
             }
 
             [Fact]
@@ -83,7 +93,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFlatMapResultIsCorrect()
             {
-                result.Error.Should().Be("Borked");
+                result.AssertError("Borked");
             }
 
             [Fact]
@@ -111,7 +121,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheMapResultIsCorrect()
             {
-                result.Success.Should().Be(84);
+                result.AssertSuccess(84);
             }
 
             [Fact]
@@ -139,7 +149,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheErrorMapResultIsCorrect()
             {
-                result.Success.Should().Be(42);
+                result.AssertSuccess(42);
             }
 
             [Fact]
@@ -247,12 +257,12 @@ namespace Badger.Common.Tests
                 var r = from v in result
                         select v;
 
-                r.Success.Should().Be(42);
+                r.AssertSuccess(42);
 
                 r = from v in result
                     select v * 2;
 
-                r.Success.Should().Be(84);
+                r.AssertSuccess(84);
             }
 
             [Fact]
@@ -262,7 +272,7 @@ namespace Badger.Common.Tests
                         from v2 in ErrorsOnEvenValues(v1 + 1)
                         select v2;
 
-                r.Success.Should().Be(43);
+                r.AssertSuccess(43);
 
                 r = from v1 in result
                     from v2 in ErrorsOnEvenValues(v1)
@@ -287,15 +297,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheErrorIsCorrect()
             {
-                result.Error.Should().Be("Borked");
-            }
-
-            [Fact]
-            public void ThenTheSuccessThrows()
-            {
-                var ex = Assert.Throws<InvalidOperationException>(() => result.Success);
-
-                ex.Message.Should().Be("Success value not available on Erorr");
+                result.AssertError("Borked");
             }
 
             [Fact]
@@ -323,7 +325,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFlatMapResultIsCorrect()
             {
-                result.Error.Should().Be("Borked");
+                result.AssertError("Borked");
             }
 
             [Fact]
@@ -351,7 +353,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFlatMapResultIsCorrect()
             {
-                result.Error.Should().Be("Borked");
+                result.AssertError("Borked");
             }
 
             [Fact]
@@ -379,7 +381,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheMapResultIsCorrect()
             {
-                result.Error.Should().Be("Borked");
+                result.AssertError("Borked");
             }
 
             [Fact]
@@ -407,7 +409,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheMapErrorResultIsCorrect()
             {
-                result.Error.Should().Be("More Borked");
+                result.AssertError("More Borked");
             }
 
             [Fact]
@@ -509,12 +511,12 @@ namespace Badger.Common.Tests
                 var r = from v in result
                         select v;
 
-                r.Error.Should().Be("Borked");
+                r.AssertError("Borked");
 
                 r = from v in result
                     select v * 2;
 
-                r.Error.Should().Be("Borked");
+                r.AssertError("Borked");
             }
 
             [Fact]
@@ -524,13 +526,13 @@ namespace Badger.Common.Tests
                         from v2 in ErrorsOnEvenValues(v1 + 1)
                         select v2;
 
-                r.Error.Should().Be("Borked");
+                r.AssertError("Borked");
 
                 r = from v1 in result
                     from v2 in ErrorsOnEvenValues(v1)
                     select v2;
 
-                r.Error.Should().Be("Borked");
+                r.AssertError("Borked");
             }
         }
     }
@@ -549,7 +551,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheResultIsCorrect()
             {
-                result.Success.Should().Be(42);
+                result.AssertSuccess(42);
             }
 
             [Fact]
@@ -580,7 +582,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheResultIsCorrect()
             {
-                result.Error.Should().Match<Exception>(e => e.Message == "Borked");
+                result.AssertError(e => e.Message == "Borked");
             }
 
             [Fact]

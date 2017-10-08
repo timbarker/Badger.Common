@@ -4,13 +4,12 @@ namespace Badger.Common
 {
     public abstract class Result<TSuccess, TError>
     {
+        internal Result() {} 
+
         public abstract bool IsSuccess { get; }
-
         public abstract bool IsError { get; }
-
-        public abstract TSuccess Success { get; }
-
-        public abstract TError Error { get; }
+        internal abstract TSuccess Success { get; }
+        internal abstract TError Error { get; }     
     }
 
     public static class Result
@@ -45,12 +44,9 @@ namespace Badger.Common
             }
 
             public override bool IsSuccess => true;
-
             public override bool IsError => false;
-
-            public override TSuccess Success { get; }
-
-            public override TError Error => throw new InvalidOperationException("Error value not available on Success");
+            internal override TSuccess Success { get; }
+            internal override TError Error => throw new InvalidOperationException("Error value not available on Success");
 
             public override string ToString()
             {
@@ -66,12 +62,9 @@ namespace Badger.Common
             }
 
             public override bool IsSuccess => false;
-
             public override bool IsError => true;
-
-            public override TSuccess Success => throw new InvalidOperationException("Success value not available on Erorr");
-
-            public override TError Error { get; }
+            internal override TSuccess Success => throw new InvalidOperationException("Success value not available on Erorr");
+            internal override TError Error { get; }
 
             public override string ToString()
             {

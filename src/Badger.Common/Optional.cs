@@ -4,8 +4,9 @@ namespace Badger.Common
 {
     public abstract class Optional<T>
     {
-        public abstract T Value { get; }
-
+        internal Optional() {}
+        
+        internal abstract T Value { get; }
         public abstract bool HasValue { get; }
     }
 
@@ -36,7 +37,7 @@ namespace Badger.Common
                 Value = value;
             }
 
-            public override T Value { get; }
+            internal override T Value { get; }
 
             public override bool HasValue => true;
 
@@ -48,7 +49,7 @@ namespace Badger.Common
 
         private sealed class NoneOptional<T> : Optional<T>
         {
-            public override T Value => throw new InvalidOperationException("None does not have a value");
+            internal override T Value => throw new InvalidOperationException("None does not have a value");
 
             public override bool HasValue => false;
         }

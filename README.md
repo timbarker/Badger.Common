@@ -20,7 +20,7 @@ using (SystemTime.Freeze())
 
 ## Optional
 
-Wraps a value that may or may not be present 
+Wraps a value that may or may not be present. The only way to access the value is to use the methods provided.
 
 ```csharp
 // Division is not defined when b is zero
@@ -53,6 +53,9 @@ result.WhenNone(() => Console.WriteLine("None"))
 // converts to nullable type (for value types only)
 result.ToNullable(); 
 
+// returns true if the result has a value
+result.HasValue;
+
 ```
 
 ### LINQ query expressions
@@ -68,7 +71,7 @@ select v2 * 2;
 ```
 
 ## Result
-Wraps a Success value or an Error value
+Wraps a Success value or an Error value. The only way to access the error or the success value is to use the methods provided.
 
 ```csharp
 Result<int, string> SomethingThatCouldFail(int someData)
@@ -103,6 +106,12 @@ result.WhenError(e => Console.WriteLine(e));
 
 // returns the success value or throws (only if TError is an exception)
 result.SuccessOrThrow();
+
+// returns true if the result is Success
+result.IsSuccess;
+
+// returns true if the result is an Error
+result.IsError;
 ```
 
 ### LINQ query expressions

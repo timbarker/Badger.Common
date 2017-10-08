@@ -5,6 +5,16 @@ using Badger.Common.Linq;
 
 namespace Badger.Common.Tests
 {
+    static class OptionalTestHelperExtensions
+    {
+        public static void AssertSome<T>(this Optional<T> optional, T value)
+        {
+            optional
+                .WhenSome(s => s.Should().Be(value))
+                .WhenNone(() => Assert.True(false, $"expected some: {value} but got None"));
+        }
+    }
+
     public class GivenANonNullNullable
     {
         public class WhenConvertingToAnOptional
@@ -19,7 +29,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheValueIsCorrect()
             {
-                optional.Value.Should().Be(42);
+                optional.AssertSome(42);
             }
 
             [Fact]
@@ -83,7 +93,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheValueShouldBeCorrect()
             {
-                optional.Value.Should().Be(42);
+                optional.AssertSome(42);
             }
 
             [Fact]
@@ -105,7 +115,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFlatMapResultIsCorrect()
             {
-                result.Value.Should().Be(84);
+                result.AssertSome(84);
             }
         }
 
@@ -137,7 +147,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheMapResultIsCorrect()
             {
-                result.Value.Should().Be(84);
+                result.AssertSome(84);
             }
         }
 
@@ -153,7 +163,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFilterResultShouldBeCorrect()
             {
-                result.Value.Should().Be(42);
+                result.AssertSome(42);
             }
         }
 
@@ -282,12 +292,12 @@ namespace Badger.Common.Tests
                 var result = from v in optional
                              select v;
 
-                result.Value.Should().Be(42);
+                result.AssertSome(42);
 
                 result = from v in optional
                          select v * 2;
 
-                result.Value.Should().Be(84);
+                result.AssertSome(84);
             }
 
             [Fact]
@@ -297,7 +307,7 @@ namespace Badger.Common.Tests
                              from v2 in Divide(420, v1)
                              select v2;
 
-                result.Value.Should().Be(10);
+                result.AssertSome(10);
 
                 result = from v1 in optional
                          from v2 in Divide(v1, 0)
@@ -313,7 +323,7 @@ namespace Badger.Common.Tests
                              where v == 42
                              select v;
 
-                result.Value.Should().Be(42);
+                result.AssertSome(42);
 
                 result = from v in optional
                          where v != 42
@@ -326,29 +336,6 @@ namespace Badger.Common.Tests
 
     public class GivenANone
     {
-        public class WhenGettingTheValue
-        {
-            private readonly Optional<int> optional;
-
-            public WhenGettingTheValue()
-            {
-                optional = Optional.None<int>();
-            }
-
-            [Fact]
-            public void ThenTheValueShouldBeCorrect()
-            {
-                var ex = Assert.Throws<InvalidOperationException>(() => optional.Value);
-                ex.Message.Should().Be("None does not have a value");
-            }
-
-            [Fact]
-            public void ThenTheValueShouldBePresent()
-            {
-                optional.HasValue.Should().BeFalse();
-            }
-        }
-
         public class WhenFlatMapping
         {
             private readonly Optional<int> result;
