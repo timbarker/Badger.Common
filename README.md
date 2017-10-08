@@ -5,7 +5,7 @@ Set of useful C# utilities
 
 ## SystemTime
 
-Useful in test code to freeze time
+Useful in test code to freeze time. Normally the test setup would freeze the time and the teardown would dispose the result returned from calling Freeze. Application code would use SystemTime.UtcNow instead of DateTime.UtcNow.
 
 ```csharp
 // Freeze time now (or optionally specify the DateTime to freeze at)
@@ -14,10 +14,6 @@ using (SystemTime.Freeze())
     // Always returns the same value until the using block exit
     Console.WriteLine(SystemTime.UtcNow); 
 }
-
-// Normally the test setup would freeze the time and the teardown would dispose the 
-// resylt of calling Freeze. Application code would use SystemTime.UtcNow 
-// over DateTime.UtcNow
 ```
 
 ## Optional
@@ -34,8 +30,11 @@ Optional<int> Divide(int a, int b)
 
 var result = Divide(100, 2);
 
-// returns the result or 0 if result is None
-result.ValueOr(0); 
+// returns the result or a supplied default if result is None
+result.ValueOr(42); 
+
+// returns the result or invokes a function to get a default if result is None
+result.ValueOr(() => 42);
 
 // multiplies the result by 100 only if result is not None
 result.Map(v => v * 100); 
