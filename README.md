@@ -56,6 +56,10 @@ result.ToNullable();
 // returns true if the result has a value
 result.HasValue;
 
+// if you have a nullable value there is a helper to convert to an Optional
+int? x = 42;
+var result = Optional.FromNullable(x);
+
 ```
 
 ### LINQ query expressions
@@ -112,6 +116,9 @@ result.IsSuccess;
 
 // returns true if the result is an Error
 result.IsError;
+
+// if calling a method that throws there is Result.Try to automatically wrap the exception
+var result = Result.Try<int, FormatException>(() => int.Parse("123"));
 ```
 
 ### LINQ query expressions
