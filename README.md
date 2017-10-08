@@ -5,6 +5,8 @@ Set of useful C# utilities
 
 Useful in test code to freeze time
 
+[![Build Status](https://travis-ci.org/timbarker/Badger.Common.svg?branch=master)](https://travis-ci.org/timbarker/Badger.Common)
+
 ```csharp
 // Freeze time now (or optionally specify the DateTime to freeze at)
 using (SystemTime.Freeze())
