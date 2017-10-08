@@ -1,6 +1,7 @@
 using System;
 using FluentAssertions;
 using Xunit;
+using Badger.Common.Linq;
 
 namespace Badger.Common.Tests
 {

@@ -1,6 +1,7 @@
 using Xunit;
 using FluentAssertions;
 using System;
+using Badger.Common.Linq;
 
 namespace Badger.Common.Tests
 {
@@ -193,7 +194,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void TheReturnedOptionShouldBeTheSame()
             {
-                optional.WhenSome(_ => {}).Should().BeSameAs(optional);
+                optional.WhenSome(_ => { }).Should().BeSameAs(optional);
             }
         }
 
@@ -218,7 +219,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void TheReturnedOptionShouldBeTheSame()
             {
-                optional.WhenNone(() => {}).Should().BeSameAs(optional);
+                optional.WhenNone(() => { }).Should().BeSameAs(optional);
             }
         }
 
@@ -450,7 +451,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void TheReturnedOptionShouldBeTheSame()
             {
-                optional.WhenSome(_ => {}).Should().BeSameAs(optional);
+                optional.WhenSome(_ => { }).Should().BeSameAs(optional);
             }
         }
 
@@ -475,7 +476,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void TheReturnedOptionShouldBeTheSame()
             {
-                optional.WhenNone(() => {}).Should().BeSameAs(optional);
+                optional.WhenNone(() => { }).Should().BeSameAs(optional);
             }
         }
 
@@ -554,7 +555,7 @@ namespace Badger.Common.Tests
                              select v2;
 
                 result.HasValue.Should().BeFalse();
-                
+
                 result = from v1 in optional
                          from v2 in Divide(v1, 0)
                          select v2;

@@ -1,6 +1,6 @@
 using System;
 
-namespace Badger.Common
+namespace Badger.Common.Linq
 {
     public static class ResultLinqExtensions
     {
