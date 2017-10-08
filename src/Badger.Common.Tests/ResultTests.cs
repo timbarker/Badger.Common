@@ -175,6 +175,51 @@ namespace Badger.Common.Tests
                 result.SuccessOrThrow().Should().Be(42);
             }
         }
+
+        public class WhenUsedInALinqExpression
+        {
+            private readonly Result<int, string> result;
+
+            public WhenUsedInALinqExpression()
+            {
+                result = Result.Ok<int, string>(42);
+            }
+
+            private static Result<int, string> ErrorsOnEvenValues(int x)
+            {
+                return x % 2 == 0 ? Result.Error<int, string>("Evens not allowed") : Result.Ok<int, string>(x);
+            }
+
+            [Fact]
+            public void ThenSelectWorksAsExpected()
+            {
+                var r = from v in result
+                        select v;
+
+                r.Success.Should().Be(42);
+
+                r = from v in result
+                    select v * 2;
+
+                r.Success.Should().Be(84);
+            }
+
+            [Fact]
+            public void ThenSelectManyWorksAsExpected()
+            {
+                var r = from v1 in result
+                        from v2 in ErrorsOnEvenValues(v1 + 1)
+                        select v2;
+
+                r.Success.Should().Be(43);
+
+                r = from v1 in result
+                    from v2 in ErrorsOnEvenValues(v1)
+                    select v2;
+
+                r.IsSuccess.Should().BeFalse();
+            }
+        }
     }
 
     public class GivenAnError
@@ -340,6 +385,51 @@ namespace Badger.Common.Tests
             public void ThenAnExceptionIsThrown()
             {
                 result.Invoking(r => r.SuccessOrThrow()).ShouldThrow<Exception>().WithMessage("Borked");
+            }
+        }
+
+        public class WhenUsedInALinqExpression
+        {
+            private readonly Result<int, string> result;
+
+            public WhenUsedInALinqExpression()
+            {
+                result = Result.Error<int, string>("Borked");
+            }
+
+            private static Result<int, string> ErrorsOnEvenValues(int x)
+            {
+                return x % 2 == 0 ? Result.Error<int, string>("Evens not allowed") : Result.Ok<int, string>(x);
+            }
+
+            [Fact]
+            public void ThenSelectWorksAsExpected()
+            {
+                var r = from v in result
+                        select v;
+
+                r.Error.Should().Be("Borked");
+
+                r = from v in result
+                    select v * 2;
+
+                r.Error.Should().Be("Borked");
+            }
+
+            [Fact]
+            public void ThenSelectManyWorksAsExpected()
+            {
+                var r = from v1 in result
+                        from v2 in ErrorsOnEvenValues(v1 + 1)
+                        select v2;
+
+                r.Error.Should().Be("Borked");
+
+                r = from v1 in result
+                    from v2 in ErrorsOnEvenValues(v1)
+                    select v2;
+
+                r.Error.Should().Be("Borked");
             }
         }
     }

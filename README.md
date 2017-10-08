@@ -92,3 +92,13 @@ result.MapError(e => "Whoops");
 // returns the success value or throws (only if TError is an exception)
 result.SuccessOrThrow();
 ```
+
+### LINQ query expressions
+
+```csharp
+// same as for Optional, query evaluation is short circuited as soon as there is an error
+from r1 in SomethingThatCouldFail(100)
+from r2 in SomethingThatCouldFail(r1)
+select r2 * 15;
+
+```
