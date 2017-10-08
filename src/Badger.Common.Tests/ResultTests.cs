@@ -545,7 +545,7 @@ namespace Badger.Common.Tests
 
             public WhenTrying()
             {
-                result = Result.Try<int, Exception>(() => 42);
+                result = Result.Try(() => 42);
             }
 
             [Fact]

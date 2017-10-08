@@ -36,6 +36,11 @@ namespace Badger.Common
             }
         }
 
+        public static Result<TSuccess, Exception> Try<TSuccess>(Func<TSuccess> work)
+        {
+            return Try<TSuccess, Exception>(work);
+        }
+
         private sealed class SuccessResult<TSuccess, TError> : Result<TSuccess, TError>
         {
             public SuccessResult(TSuccess success)

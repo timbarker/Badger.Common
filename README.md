@@ -118,8 +118,11 @@ result.IsSuccess;
 // returns true if the result is an Error
 result.IsError;
 
-// if calling a method that throws there is Result.Try to automatically wrap the exception
+// if calling a method that throws a specific there is Result.Try to automatically wrap the exception
 var result = Result.Try<int, FormatException>(() => int.Parse("123"));
+
+// or if you want to catch any exception
+var result = Result.Try(() => int.Parse("123"));
 ```
 
 ### LINQ query expressions
