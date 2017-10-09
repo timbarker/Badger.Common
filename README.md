@@ -24,8 +24,10 @@ Wraps a value that may or may not be present. The only way to access the value i
 // Division is not defined when b is zero
 Optional<int> Divide(int a, int b)
 {
-    if (b == 0) return Optional.None<int>();
-    else return Optional.Some(a / b);
+    if (b == 0) 
+        return Optional.None<int>();
+    else 
+        return Optional.Some(a / b);
 }
 
 var optional = Divide(100, 2);
@@ -70,26 +72,21 @@ optional.AsEnumerable();
 Wraps a Ok value or an Error value. The only way to access the error or the ok value is to use the methods provided.
 
 ```csharp
-Result<int, string> SomethingThatCouldFail(int someData)
+Result<int, string> Divide(int a, int b)
 {
-    try 
-    {
-        // lets pretend this could fail sometimes
-        return Result.Ok<int, string>(someData * 2);
-    }
-    catch (Exception ex)
-    {
-        return Result.Error<int, string>(ex.Message);
-    }
+    if (b == 0) 
+        return Result.Error<int, string>("Division by zero");
+    else 
+        return Result.Ok<int, string>(a / b);
 }
 
-var result = SomethingThatCouldFail(200);
+var result = Divide(100, 2);
 
 // multiplies the result by 100 only if result is Ok
 result.Map(r => r * 2);
 
-// calls SomethingThatCouldFail again only if result is Ok
-result.FlatMap(r => SomethingThatCouldFail(r));
+// calls Divide again only if result is Ok
+result.FlatMap(r => Divide(250, r));
 
 // changes the error string to "Whoops" if result is an Error
 result.MapError(e => "Whoops");
