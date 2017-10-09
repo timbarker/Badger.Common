@@ -6,6 +6,7 @@ namespace Badger.Common.Tests
 {
     public class GivenAnUnfrozenSystemTime
     {
+        [Collection("SystemTimeTests")]
         public class WhenFreezingWithAnExplcitTime : IDisposable
         {
             private readonly DateTime frozenTime = new DateTime(2017, 10, 8, 12, 22, 33);
@@ -27,6 +28,7 @@ namespace Badger.Common.Tests
             }
         }
 
+        [Collection("SystemTimeTests")]
         public class WhenFreezingWitWithoutAnExplicitTime : IDisposable
         {
             private readonly DateTime frozenTime;
@@ -52,6 +54,7 @@ namespace Badger.Common.Tests
 
     public class GivenAnFrozenSystemTime
     {
+        [Collection("SystemTimeTests")]
         public class WhenUnfreezing
         {        
             private readonly DateTime frozenTime = new DateTime(2017, 10, 8, 12, 22, 33);
@@ -70,6 +73,7 @@ namespace Badger.Common.Tests
             }
         }
 
+        [Collection("SystemTimeTests")]
         public class WhenFreezing : IDisposable
         {
             private readonly DateTime firstFrozenTime = new DateTime(2017, 10, 8, 12, 22, 33);
@@ -93,7 +97,8 @@ namespace Badger.Common.Tests
                 SystemTime.UtcNow.Should().Equals(secondFrozenTime);
             }
         }
-
+        
+        [Collection("SystemTimeTests")]
         public class WhenUnfreezingMultipleTimes
         {        
             private readonly DateTime frozenTime = new DateTime(2017, 10, 8, 12, 22, 33);
