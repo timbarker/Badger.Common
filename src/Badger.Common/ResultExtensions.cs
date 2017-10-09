@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Badger.Common
 {
@@ -56,6 +57,11 @@ namespace Badger.Common
         {
             if (result.HasValue) return result.Value;
             return getDefault(result.Error);
+        }
+
+        public static IEnumerable<T> AsEnumerable<T, TError>(this Result<T, TError> result)
+        {
+            if (result.HasValue) yield return result.Value;
         }
     }
 }

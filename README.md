@@ -28,51 +28,42 @@ Optional<int> Divide(int a, int b)
     else return Optional.Some(a / b);
 }
 
-var result = Divide(100, 2);
+var optional = Divide(100, 2);
 
 // returns the result or a supplied default if result is None
-result.ValueOr(42); 
+optional.ValueOr(42); 
 
 // returns the result or invokes a function to get a default if result is None
-result.ValueOr(() => 42);
+optional.ValueOr(() => 42);
 
 // multiplies the result by 100 only if result is not None
-result.Map(v => v * 100); 
+optional.Map(v => v * 100); 
 
 // calls Divide again only if result is not None
-result.FlatMap(v => Divide(250, v)); 
+optional.FlatMap(v => Divide(250, v)); 
 
 // returns Some only if the predicate holds true and result is not None, else it results None
-result.Filter(v => v % 2 == 0); 
+optional.Filter(v => v % 2 == 0); 
 
 // invokes the action supplied if the result is not None
-result.WhenSome(r => Console.WriteLine(r));
+optional.WhenSome(r => Console.WriteLine(r));
 
 // invokes the action supplied if the result is None
-result.WhenNone(() => Console.WriteLine("None"))
+optional.WhenNone(() => Console.WriteLine("None"))
 
 // converts to nullable type (for value types only)
-result.ToNullable(); 
+optional.ToNullable(); 
 
 // returns true if the result has a value
-result.HasValue;
+optional.HasValue;
 
 // if you have a nullable value there is a helper to convert to an Optional
 int? x = 42;
-var result = Optional.FromNullable(x);
+var optional = Optional.FromNullable(x);
 
-```
+// converts to an IEnumerable<T>, has one item if Some, else is empty
+optional.AsEnumerable();
 
-### LINQ query expressions
-
-```csharp
-// continues evaluating the query if each part is not None, when part of the query returns a 
-// None result the query stops evaluating and returns a None result. If all parts return a 
-// Some value then the query will have a Some result
-from v1 in Divide(100, 2)
-from v2 in Divide(500, v1)
-where v2 > 5
-select v2 * 2; 
 ```
 
 ## Result
@@ -129,16 +120,9 @@ var result = Result.Try<int, FormatException>(() => int.Parse("123"));
 
 // or if you want to catch any exception
 var result = Result.Try(() => int.Parse("123"));
-```
 
-### LINQ query expressions
-
-```csharp
-// same as for Optional, query evaluation is short circuited as soon as there is an error
-from r1 in SomethingThatCouldFail(100)
-from r2 in SomethingThatCouldFail(r1)
-select r2 * 15;
-
+// converts to an IEnumerable<T>, has one item if Ok, else is empty
+result.AsEnumerable();
 ```
 
 ## Disposable

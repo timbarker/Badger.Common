@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
-using Badger.Common.Linq;
 
 namespace Badger.Common.Tests
 {
@@ -256,48 +256,19 @@ namespace Badger.Common.Tests
             }
         }
 
-        public class WhenUsedInALinqExpression
+        public class WhenConvertingToAnEnumerable
         {
-            private readonly Result<int, string> result;
+            private readonly IEnumerable<int> enumerable;
 
-            public WhenUsedInALinqExpression()
+            public WhenConvertingToAnEnumerable()
             {
-                result = Result.Ok<int, string>(42);
-            }
-
-            private static Result<int, string> ErrorsOnEvenValues(int x)
-            {
-                return x % 2 == 0 ? Result.Error<int, string>("Evens not allowed") : Result.Ok<int, string>(x);
+                enumerable = Result.Ok<int, string>(42).AsEnumerable();
             }
 
             [Fact]
-            public void ThenSelectWorksAsExpected()
+            public void ThenTheEnumerableHasOneItem()
             {
-                var r = from v in result
-                        select v;
-
-                r.AssertOk(42);
-
-                r = from v in result
-                    select v * 2;
-
-                r.AssertOk(84);
-            }
-
-            [Fact]
-            public void ThenSelectManyWorksAsExpected()
-            {
-                var r = from v1 in result
-                        from v2 in ErrorsOnEvenValues(v1 + 1)
-                        select v2;
-
-                r.AssertOk(43);
-
-                r = from v1 in result
-                    from v2 in ErrorsOnEvenValues(v1)
-                    select v2;
-
-                r.HasValue.Should().BeFalse();
+                enumerable.Should().Equal(42);
             }
         }
     }
@@ -529,48 +500,19 @@ namespace Badger.Common.Tests
             }
         }
 
-        public class WhenUsedInALinqExpression
+        public class WhenConvertingToAnEnumerable
         {
-            private readonly Result<int, string> result;
+            private readonly IEnumerable<int> enumerable;
 
-            public WhenUsedInALinqExpression()
+            public WhenConvertingToAnEnumerable()
             {
-                result = Result.Error<int, string>("Borked");
-            }
-
-            private static Result<int, string> ErrorsOnEvenValues(int x)
-            {
-                return x % 2 == 0 ? Result.Error<int, string>("Evens not allowed") : Result.Ok<int, string>(x);
+                enumerable = Result.Error<int, string>("Borked").AsEnumerable();
             }
 
             [Fact]
-            public void ThenSelectWorksAsExpected()
+            public void ThenTheEnumerableIsEmpty()
             {
-                var r = from v in result
-                        select v;
-
-                r.AssertError("Borked");
-
-                r = from v in result
-                    select v * 2;
-
-                r.AssertError("Borked");
-            }
-
-            [Fact]
-            public void ThenSelectManyWorksAsExpected()
-            {
-                var r = from v1 in result
-                        from v2 in ErrorsOnEvenValues(v1 + 1)
-                        select v2;
-
-                r.AssertError("Borked");
-
-                r = from v1 in result
-                    from v2 in ErrorsOnEvenValues(v1)
-                    select v2;
-
-                r.AssertError("Borked");
+                enumerable.Should().BeEmpty();
             }
         }
     }

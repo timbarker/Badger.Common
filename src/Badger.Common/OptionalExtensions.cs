@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Badger.Common
 {
@@ -49,6 +50,11 @@ namespace Badger.Common
         {
             if (optional.HasValue) return optional.Value;
             else return null;
+        }
+
+        public static IEnumerable<T> AsEnumerable<T>(this Optional<T> optional)
+        {
+            if (optional.HasValue) yield return optional.Value;
         }
     }
 }

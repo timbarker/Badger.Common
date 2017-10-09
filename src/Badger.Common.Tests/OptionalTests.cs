@@ -1,7 +1,7 @@
 using Xunit;
 using FluentAssertions;
 using System;
-using Badger.Common.Linq;
+using System.Collections.Generic;
 
 namespace Badger.Common.Tests
 {
@@ -271,65 +271,19 @@ namespace Badger.Common.Tests
             }
         }
 
-        public class WhenUsedInALinqExpression
+        public class WhenConvertingToAnEnumerable
         {
-            private readonly Optional<int> optional;
+            private readonly IEnumerable<int> enumerable;
 
-            public WhenUsedInALinqExpression()
+            public WhenConvertingToAnEnumerable()
             {
-                optional = Optional.Some(42);
-            }
-
-            private static Optional<int> Divide(int a, int b)
-            {
-                if (b == 0) return Optional.None<int>();
-                return Optional.Some(a / b);
+                enumerable = Optional.Some(42).AsEnumerable();
             }
 
             [Fact]
-            public void ThenSelectWorksAsExpected()
+            public void ThenTheEnumerableHasOneItem()
             {
-                var result = from v in optional
-                             select v;
-
-                result.AssertSome(42);
-
-                result = from v in optional
-                         select v * 2;
-
-                result.AssertSome(84);
-            }
-
-            [Fact]
-            public void ThenSelectManyWorksAsExpected()
-            {
-                var result = from v1 in optional
-                             from v2 in Divide(420, v1)
-                             select v2;
-
-                result.AssertSome(10);
-
-                result = from v1 in optional
-                         from v2 in Divide(v1, 0)
-                         select v2;
-
-                result.HasValue.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenWhereWorksAsExpected()
-            {
-                var result = from v in optional
-                             where v == 42
-                             select v;
-
-                result.AssertSome(42);
-
-                result = from v in optional
-                         where v != 42
-                         select v;
-
-                result.HasValue.Should().BeFalse();
+                enumerable.Should().Equal(42);
             }
         }
     }
@@ -505,65 +459,19 @@ namespace Badger.Common.Tests
             }
         }
 
-        public class WhenUsedInALinqExpression
+        public class WhenConvertingToAnEnumerable
         {
-            private readonly Optional<int> optional;
+            private readonly IEnumerable<int> enumerable;
 
-            public WhenUsedInALinqExpression()
+            public WhenConvertingToAnEnumerable()
             {
-                optional = Optional.None<int>();
-            }
-
-            private static Optional<int> Divide(int a, int b)
-            {
-                if (b == 0) return Optional.None<int>();
-                return Optional.Some(a / b);
+                enumerable = Optional.None<int>().AsEnumerable();
             }
 
             [Fact]
-            public void ThenSelectWorksAsExpected()
+            public void ThenTheEnumerableIsEmpty()
             {
-                var result = from v in optional
-                             select v;
-
-                result.HasValue.Should().BeFalse();
-
-                result = from v in optional
-                         select v * 2;
-
-                result.HasValue.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenSelectManyWorksAsExpected()
-            {
-                var result = from v1 in optional
-                             from v2 in Divide(420, v1)
-                             select v2;
-
-                result.HasValue.Should().BeFalse();
-
-                result = from v1 in optional
-                         from v2 in Divide(v1, 0)
-                         select v2;
-
-                result.HasValue.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenWhereWorksAsExpected()
-            {
-                var result = from v in optional
-                             where v == 42
-                             select v;
-
-                result.HasValue.Should().BeFalse();
-
-                result = from v in optional
-                         where v != 42
-                         select v;
-
-                result.HasValue.Should().BeFalse();
+                enumerable.Should().BeEmpty();
             }
         }
     }
