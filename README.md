@@ -140,3 +140,14 @@ from r2 in SomethingThatCouldFail(r1)
 select r2 * 15;
 
 ```
+
+## Disposable
+
+Wraps an action creating an IDisposable
+
+```csharp
+IDisposable disposable = Disposable.From(() => Console.WriteLine("Disposing"));
+
+// prints "Disposing"
+disposable.Dispose();
+```
