@@ -7,29 +7,29 @@ namespace Badger.Common.Tests
 {
     static class ResultTestHelperExtensions
     {
-        public static void AssertSuccess<TSuccess, TError>(this Result<TSuccess, TError> result, TSuccess success)
+        public static void AssertOk<T, TError>(this Result<T, TError> result, T ok)
         {
             result
-                .WhenSuccess(s => s.Should().Be(success))
-                .WhenError(e => Assert.True(false, $"expected success: {success} but got error: {e}"));
+                .WhenOk(s => s.Should().Be(ok))
+                .WhenError(e => Xunit.Assert.True(false, $"expected Ok: {ok} but got error: {e}"));
         }
 
-        public static void AssertError<TSuccess, TError>(this Result<TSuccess, TError> result, TError error)
+        public static void AssertError<T, TError>(this Result<T, TError> result, TError error)
         {
             result
                 .WhenError(e => e.Should().Be(error))
-                .WhenSuccess(s => Assert.True(false, $"expected error: {error} but got success: {s}"));
+                .WhenOk(s => Xunit.Assert.True(false, $"expected error: {error} but got Ok: {s}"));
         }
 
-        public static void AssertError<TSuccess, TError>(this Result<TSuccess, TError> result, Predicate<TError> errorCheck)
+        public static void AssertError<T, TError>(this Result<T, TError> result, Predicate<TError> errorCheck)
         {
             result
                .WhenError(e => errorCheck(e).Should().BeTrue())
-               .WhenSuccess(s => Assert.True(false, $"expected error but got success: {s}"));
+               .WhenOk(s => Xunit.Assert.True(false, $"expected error but got Ok: {s}"));
         }
     }
 
-    public class GivenASuccess
+    public class GivenAnOk
     {
         public class WhenResultOk
         {
@@ -41,15 +41,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldBeSuccess()
+            public void ThenTheResultShouldHaveAValue()
             {
-                result.IsSuccess.Should().BeTrue();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldNotBeError()
-            {
-                result.IsError.Should().BeFalse();
+                result.HasValue.Should().BeTrue();
             }
         }
 
@@ -65,19 +59,13 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheFlatMapResultIsCorrect()
             {
-                result.AssertSuccess(84);
+                result.AssertOk(84);
             }
 
             [Fact]
-            public void ThenTheResultShouldBeSuccess()
+            public void ThenTheResultShouldHaveAValue()
             {
-                result.IsSuccess.Should().BeTrue();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldNotBeError()
-            {
-                result.IsError.Should().BeFalse();
+                result.HasValue.Should().BeTrue();
             }
         }
 
@@ -97,15 +85,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBeSuccess()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
 
@@ -121,19 +103,13 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheMapResultIsCorrect()
             {
-                result.AssertSuccess(84);
+                result.AssertOk(84);
             }
 
             [Fact]
-            public void ThenTheResultShouldBeSuccess()
+            public void ThenTheResultShouldHaveAValue()
             {
-                result.IsSuccess.Should().BeTrue();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldNotBeError()
-            {
-                result.IsError.Should().BeFalse();
+                result.HasValue.Should().BeTrue();
             }
         }
 
@@ -149,27 +125,21 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheErrorMapResultIsCorrect()
             {
-                result.AssertSuccess(42);
+                result.AssertOk(42);
             }
 
             [Fact]
-            public void ThenTheResultShouldBeSuccess()
+            public void ThenTheResultShouldHaveAValue()
             {
-                result.IsSuccess.Should().BeTrue();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldNotBeError()
-            {
-                result.IsError.Should().BeFalse();
+                result.HasValue.Should().BeTrue();
             }
         }
 
-        public class WhenInvokingWhenSuccess
+        public class WhenInvokingWhenOk
         {
             private readonly Result<int, string> result;
 
-            public WhenInvokingWhenSuccess()
+            public WhenInvokingWhenOk()
             {
                 result = Result.Ok<int, string>(42);
             }
@@ -178,7 +148,7 @@ namespace Badger.Common.Tests
             public void ThenTheActionShouldBeInvoked()
             {
                 int invokedArg = 0;
-                result.WhenSuccess(s => invokedArg = s);
+                result.WhenOk(s => invokedArg = s);
 
                 invokedArg.Should().Be(42);
             }
@@ -186,7 +156,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void TheReturnedResultShouldBeTheSame()
             {
-                result.WhenSuccess(_ => { }).Should().BeSameAs(result);
+                result.WhenOk(_ => { }).Should().BeSameAs(result);
             }
         }
 
@@ -215,11 +185,11 @@ namespace Badger.Common.Tests
             }
         }
 
-        public class WhenSuccessOrThrow
+        public class WhenValueOrThrow
         {
             private readonly Result<int, Exception> result;
 
-            public WhenSuccessOrThrow()
+            public WhenValueOrThrow()
             {
                 result = Result.Ok<int, Exception>(42);
             }
@@ -227,13 +197,62 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenAnExceptionIsNotThrown()
             {
-                result.Invoking(r => r.SuccessOrThrow()).ShouldNotThrow<Exception>();
+                result.Invoking(r => r.ValueOrThrow()).ShouldNotThrow<Exception>();
             }
 
             [Fact]
             public void ThenTheResultIsNotChanged()
             {
-                result.SuccessOrThrow().Should().Be(42);
+                result.ValueOrThrow().Should().Be(42);
+            }
+        }
+
+        public class WhenValueOr
+        {
+            private readonly int result;
+
+            public WhenValueOr()
+            {
+                result = Result.Ok<int, string>(42).ValueOr(100);
+            }
+
+            [Fact]
+            public void ThenTheOkValueIsReturned()
+            {
+                result.Should().Be(42);
+            }
+        }
+
+        public class WhenValueOrCallback
+        {
+            private readonly int result;
+
+            public WhenValueOrCallback()
+            {
+                result = Result.Ok<int, string>(42).ValueOr(() => 100);
+            }
+
+            [Fact]
+            public void ThenTheOkValueIsReturned()
+            {
+                result.Should().Be(42);
+            }
+        }
+
+
+        public class WhenValueOrErrorCallback
+        {
+            private readonly int result;
+
+            public WhenValueOrErrorCallback()
+            {
+                result = Result.Ok<int, string>(42).ValueOr(e => 100);
+            }
+
+            [Fact]
+            public void ThenTheOkValueIsReturned()
+            {
+                result.Should().Be(42);
             }
         }
 
@@ -257,12 +276,12 @@ namespace Badger.Common.Tests
                 var r = from v in result
                         select v;
 
-                r.AssertSuccess(42);
+                r.AssertOk(42);
 
                 r = from v in result
                     select v * 2;
 
-                r.AssertSuccess(84);
+                r.AssertOk(84);
             }
 
             [Fact]
@@ -272,13 +291,13 @@ namespace Badger.Common.Tests
                         from v2 in ErrorsOnEvenValues(v1 + 1)
                         select v2;
 
-                r.AssertSuccess(43);
+                r.AssertOk(43);
 
                 r = from v1 in result
                     from v2 in ErrorsOnEvenValues(v1)
                     select v2;
 
-                r.IsSuccess.Should().BeFalse();
+                r.HasValue.Should().BeFalse();
             }
         }
     }
@@ -301,15 +320,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBe()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
 
@@ -329,15 +342,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBeBeSuccess()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
 
@@ -357,15 +364,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBeSuccess()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
 
@@ -385,15 +386,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBeSuccess()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
 
@@ -413,23 +408,17 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBeSuccess()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
 
-        public class WhenInvokingWhenSuccess
+        public class WhenInvokingWhenOk
         {
             private readonly Result<int, string> result;
 
-            public WhenInvokingWhenSuccess()
+            public WhenInvokingWhenOk()
             {
                 result = Result.Error<int, string>("Borked");
             }
@@ -438,7 +427,7 @@ namespace Badger.Common.Tests
             public void ThenTheActionShouldNotBeInvoked()
             {
                 bool invoked = false;
-                result.WhenSuccess(_ => invoked = true);
+                result.WhenOk(_ => invoked = true);
 
                 invoked.Should().BeFalse();
             }
@@ -446,7 +435,7 @@ namespace Badger.Common.Tests
             [Fact]
             public void TheReturnedResultShouldBeTheSame()
             {
-                result.WhenSuccess(_ => { }).Should().BeSameAs(result);
+                result.WhenOk(_ => { }).Should().BeSameAs(result);
             }
         }
 
@@ -475,11 +464,11 @@ namespace Badger.Common.Tests
             }
         }
 
-        public class WhenSuccessOrThrow
+        public class WhenValueOrThrow
         {
             private readonly Result<int, Exception> result;
 
-            public WhenSuccessOrThrow()
+            public WhenValueOrThrow()
             {
                 result = Result.Error<int, Exception>(new Exception("Borked"));
             }
@@ -487,7 +476,56 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenAnExceptionIsThrown()
             {
-                result.Invoking(r => r.SuccessOrThrow()).ShouldThrow<Exception>().WithMessage("Borked");
+                result.Invoking(r => r.ValueOrThrow()).ShouldThrow<Exception>().WithMessage("Borked");
+            }
+        }
+
+        public class WhenValueOr
+        {
+            private readonly int result;
+
+            public WhenValueOr()
+            {
+                result = Result.Error<int, string>("Borked").ValueOr(42);
+            }
+
+            [Fact]
+            public void ThenTheDefaultValueIsReturned()
+            {
+                result.Should().Be(42);
+            }
+        }
+
+        public class WhenValueOrCallback
+        {
+            private readonly int result;
+
+            public WhenValueOrCallback()
+            {
+                result = Result.Error<int, string>("Borked").ValueOr(() => 42);
+            }
+
+            [Fact]
+            public void ThenTheDefaultValueIsReturned()
+            {
+                result.Should().Be(42);
+            }
+        }
+
+
+        public class WhenValueOrErrorCallback
+        {
+            private readonly int result;
+
+            public WhenValueOrErrorCallback()
+            {
+                result = Result.Error<int, string>("42").ValueOr(e => int.Parse(e));
+            }
+
+            [Fact]
+            public void ThenTheOkValueIsReturned()
+            {
+                result.Should().Be(42);
             }
         }
 
@@ -551,19 +589,13 @@ namespace Badger.Common.Tests
             [Fact]
             public void ThenTheResultIsCorrect()
             {
-                result.AssertSuccess(42);
+                result.AssertOk(42);
             }
 
             [Fact]
-            public void ThenTheResultShouldBeSuccess()
+            public void ThenTheResultShouldHaveAValue()
             {
-                result.IsSuccess.Should().BeTrue();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldNotBeError()
-            {
-                result.IsError.Should().BeFalse();
+                result.HasValue.Should().BeTrue();
             }
         }
     }
@@ -586,15 +618,9 @@ namespace Badger.Common.Tests
             }
 
             [Fact]
-            public void ThenTheResultShouldNotBeSuccess()
+            public void ThenTheResultShouldNotHaveAValue()
             {
-                result.IsSuccess.Should().BeFalse();
-            }
-
-            [Fact]
-            public void ThenTheResultShouldBeError()
-            {
-                result.IsError.Should().BeTrue();
+                result.HasValue.Should().BeFalse();
             }
         }
     }

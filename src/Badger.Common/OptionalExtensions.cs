@@ -10,10 +10,10 @@ namespace Badger.Common
             return @default;
         }
 
-        public static T ValueOr<T>(this Optional<T> optional, Func<T> get)
+        public static T ValueOr<T>(this Optional<T> optional, Func<T> getDefault)
         {
             if (optional.HasValue) return optional.Value;
-            return get();
+            return getDefault();
         }
 
         public static Optional<U> FlatMap<T, U>(this Optional<T> optional, Func<T, Optional<U>> mapper)

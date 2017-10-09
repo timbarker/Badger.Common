@@ -2,73 +2,70 @@ using System;
 
 namespace Badger.Common
 {
-    public abstract class Result<TSuccess, TError>
+    public abstract class Result<T, TError>
     {
         internal Result() {} 
 
-        public abstract bool IsSuccess { get; }
-        public abstract bool IsError { get; }
-        internal abstract TSuccess Success { get; }
+        public abstract bool HasValue { get; }
+        internal abstract T Value { get; }
         internal abstract TError Error { get; }     
     }
 
     public static class Result
     {
-        public static Result<TSuccess, TError> Ok<TSuccess, TError>(TSuccess success)
+        public static Result<T, TError> Ok<T, TError>(T ok)
         {
-            return new SuccessResult<TSuccess, TError>(success);
+            return new OkResult<T, TError>(ok);
         }
 
-        public static Result<TSuccess, TError> Error<TSuccess, TError>(TError error)
+        public static Result<T, TError> Error<T, TError>(TError error)
         {
-            return new ErrorResult<TSuccess, TError>(error);
+            return new ErrorResult<T, TError>(error);
         }
 
-        public static Result<TSuccess, TError> Try<TSuccess, TError> (Func<TSuccess> work) where TError : Exception
+        public static Result<T, TError> Try<T, TError> (Func<T> work) where TError : Exception
         {
             try 
             {
-                return Ok<TSuccess, TError>(work());
+                return Ok<T, TError>(work());
             }
             catch (TError ex)
             {
-                return Error<TSuccess, TError>(ex);
+                return Error<T, TError>(ex);
             }
         }
 
-        public static Result<TSuccess, Exception> Try<TSuccess>(Func<TSuccess> work)
+        public static Result<T, Exception> Try<T>(Func<T> work)
         {
-            return Try<TSuccess, Exception>(work);
+            return Try<T, Exception>(work);
         }
 
-        private sealed class SuccessResult<TSuccess, TError> : Result<TSuccess, TError>
+        private sealed class OkResult<T, TError> : Result<T, TError>
         {
-            public SuccessResult(TSuccess success)
+            public OkResult(T ok)
             {
-                Success = success;
+                Value = ok;
             }
 
-            public override bool IsSuccess => true;
-            public override bool IsError => false;
-            internal override TSuccess Success { get; }
-            internal override TError Error => throw new InvalidOperationException("Error value not available on Success");
+            public override bool HasValue => true;
+            internal override T Value { get; }
+            internal override TError Error => throw new InvalidOperationException("Error value not available on Ok");
 
             public override string ToString()
             {
-                return $"Success{Success})";
+                return $"Ok{Value})";
             }
         }
 
-        private sealed class ErrorResult<TSuccess, TError> : Result<TSuccess, TError>
+        private sealed class ErrorResult<T, TError> : Result<T, TError>
         {
             public ErrorResult(TError error)
             {
                 Error = error;
             }
 
-            public override bool IsSuccess => false;
-            public override bool IsError => true;
-            internal override TSuccess Success => throw new InvalidOperationException("Success value not available on Erorr");
+            public override bool HasValue => false;
+            internal override T Value => throw new InvalidOperationException("Ok value not available on Erorr");
             internal override TError Error { get; }
 
             public override string ToString()

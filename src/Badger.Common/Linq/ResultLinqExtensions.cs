@@ -4,19 +4,19 @@ namespace Badger.Common.Linq
 {
     public static class ResultLinqExtensions
     {
-        public static Result<TSelectSuccess, TError> Select<TSuccess, TError, TSelectSuccess>(this Result<TSuccess, TError> result, Func<TSuccess, TSelectSuccess> selector)
+        public static Result<U, TError> Select<T, TError, U>(this Result<T, TError> result, Func<T, U> selector)
         {
             return result.Map(selector);
         }
 
-        public static Result<TMappedSuccess, TError> SelectMany<TMappedSuccess, TSuccess, TError>(this Result<TSuccess, TError> result, Func<TSuccess, Result<TMappedSuccess, TError>> selector)
+        public static Result<U, TError> SelectMany<T, TError, U>(this Result<T, TError> result, Func<T, Result<U, TError>> selector)
         {
             return result.FlatMap(selector);
         }
 
-        public static Result<TResult, TError> SelectMany<TMappedSuccess, TSuccess, TError, TResult>(this Result<TSuccess, TError> result, Func<TSuccess, Result<TMappedSuccess, TError>> optionalSelector, Func<TSuccess, TMappedSuccess, TResult> resultSelector)
+        public static Result<U2, TError> SelectMany<T, TError, U1, U2>(this Result<T, TError> result, Func<T, Result<U1, TError>> flatMapper, Func<T, U1, U2> mapper)
         {
-            return result.FlatMap(optionalSelector).Map(mapped => resultSelector(result.Success, mapped));
+            return result.FlatMap(flatMapper).Map(mapped => mapper(result.Value, mapped));
         }
     }
 }

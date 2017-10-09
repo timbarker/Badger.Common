@@ -4,40 +4,58 @@ namespace Badger.Common
 {
     public static class ResultExtensions
     {
-        public static Result<TMapSuccess, TError> FlatMap<TSuccess, TError, TMapSuccess>(this Result<TSuccess, TError> result, Func<TSuccess, Result<TMapSuccess, TError>> mapper)
+        public static Result<U, TError> FlatMap<T, TError, U>(this Result<T, TError> result, Func<T, Result<U, TError>> mapper)
         {
-            return result.IsSuccess ? mapper(result.Success) : Result.Error<TMapSuccess, TError>(result.Error);
+            return result.HasValue ? mapper(result.Value) : Result.Error<U, TError>(result.Error);
         }
 
-        public static Result<TMapSuccess, TError> Map<TSuccess, TError, TMapSuccess>(this Result<TSuccess, TError> result, Func<TSuccess,TMapSuccess> mapper) 
+        public static Result<U, TError> Map<T, TError, U>(this Result<T, TError> result, Func<T, U> mapper)
         {
-            return result.FlatMap(r => Result.Ok<TMapSuccess, TError>(mapper(r)));
+            return result.FlatMap(r => Result.Ok<U, TError>(mapper(r)));
         }
 
-        public static Result<TSuccess, TMapError> MapError<TSuccess, TError, TMapError>(this Result<TSuccess, TError> result, Func<TError, TMapError> mapper)
+        public static Result<T, UError> MapError<T, TError, UError>(this Result<T, TError> result, Func<TError, UError> mapper)
         {
-            return result.IsError ? Result.Error<TSuccess, TMapError>(mapper(result.Error)) : Result.Ok<TSuccess, TMapError>(result.Success);
-        } 
+            return !result.HasValue ? Result.Error<T, UError>(mapper(result.Error)) : Result.Ok<T, UError>(result.Value);
+        }
 
-        public static Result<TSuccess, TError> WhenSuccess<TSuccess, TError>(this Result<TSuccess, TError> result, Action<TSuccess> action) 
+        public static Result<T, TError> WhenOk<T, TError>(this Result<T, TError> result, Action<T> action)
         {
-            if (result.IsSuccess) action(result.Success);
+            if (result.HasValue) action(result.Value);
 
             return result;
         }
 
-        public static Result<TSuccess, TError> WhenError<TSuccess, TError>(this Result<TSuccess, TError> result, Action<TError> action) 
+        public static Result<T, TError> WhenError<T, TError>(this Result<T, TError> result, Action<TError> action)
         {
-            if (result.IsError) action(result.Error);
+            if (!result.HasValue) action(result.Error);
 
             return result;
         }
 
-        public static TSuccess SuccessOrThrow<TSuccess, TError>(this Result<TSuccess, TError> result) where TError : Exception
+        public static T ValueOrThrow<T, TError>(this Result<T, TError> result) where TError : Exception
         {
-            if (result.IsError) throw result.Error;
+            if (!result.HasValue) throw result.Error;
 
-            return result.Success;
+            return result.Value;
+        }
+
+        public static T ValueOr<T, TError>(this Result<T, TError> result, T @default)
+        {
+            if (result.HasValue) return result.Value;
+            return @default;
+        }
+
+        public static T ValueOr<T, TError>(this Result<T, TError> result, Func<T> getDefault)
+        {
+            if (result.HasValue) return result.Value;
+            return getDefault();
+        }
+
+        public static T ValueOr<T, TError>(this Result<T, TError> result, Func<TError, T> getDefault)
+        {
+            if (result.HasValue) return result.Value;
+            return getDefault(result.Error);
         }
     }
 }

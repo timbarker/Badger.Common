@@ -76,7 +76,7 @@ select v2 * 2;
 ```
 
 ## Result
-Wraps a Success value or an Error value. The only way to access the error or the success value is to use the methods provided.
+Wraps a Ok value or an Error value. The only way to access the error or the ok value is to use the methods provided.
 
 ```csharp
 Result<int, string> SomethingThatCouldFail(int someData)
@@ -94,29 +94,35 @@ Result<int, string> SomethingThatCouldFail(int someData)
 
 var result = SomethingThatCouldFail(200);
 
-// multiplies the result by 100 only if result is Success
+// multiplies the result by 100 only if result is Ok
 result.Map(r => r * 2);
 
-// calls SomethingThatCouldFail again only if result is Success
+// calls SomethingThatCouldFail again only if result is Ok
 result.FlatMap(r => SomethingThatCouldFail(r));
 
 // changes the error string to "Whoops" if result is an Error
 result.MapError(e => "Whoops");
 
-// invokes the supplied action if the result is Success
-result.WhenSuccess(s => Console.WriteLine(s));
+// invokes the supplied action if the result is Ok
+result.WhenOk(s => Console.WriteLine(s));
 
 // invokes the supplied action if the result is an Error
 result.WhenError(e => Console.WriteLine(e));
 
-// returns the success value or throws (only if TError is an exception)
-result.SuccessOrThrow();
+// returns the Ok value or throws (only if TError is an exception)
+result.ValueOrThrow();
 
-// returns true if the result is Success
-result.IsSuccess;
+// returns the Ok value or the supplied default
+result.ValueOr(42);
 
-// returns true if the result is an Error
-result.IsError;
+// returns the Ok value or invokes a function to get a default
+result.ValueOr(() => 42);
+
+// returns the Ok value or invokes a function with the error to get a default 
+result.ValueOr(e => 42);
+
+// returns true if the result is Ok
+result.HasValue;
 
 // if calling a method that throws a specific there is Result.Try to automatically wrap the exception
 var result = Result.Try<int, FormatException>(() => int.Parse("123"));
