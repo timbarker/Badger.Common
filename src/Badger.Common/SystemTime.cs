@@ -12,14 +12,14 @@ namespace Badger.Common
         {
             var frozen = time ?? DateTime.UtcNow;
             _timeSource = () => frozen;
-            return Resetter.Instace;
+            return Resetter.Instance;
         }
 
         private static void Reset() => _timeSource = _defaultTimeSource;
 
         private class Resetter : IDisposable
         {
-            public static readonly Resetter Instace = new Resetter();
+            public static readonly Resetter Instance = new Resetter();
             
             public void Dispose()
             {
