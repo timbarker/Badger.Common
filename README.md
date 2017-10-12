@@ -2,6 +2,7 @@
 Set of useful C# utilities
 
 [![Build Status](https://travis-ci.org/timbarker/Badger.Common.svg?branch=master)](https://travis-ci.org/timbarker/Badger.Common)
+[![Nuget Package](https://img.shields.io/nuget/v/Badger.Common.svg?style=flat)](https://www.nuget.org/packages/Badger.Common/)
 
 ## SystemTime
 
