@@ -6,6 +6,15 @@ notifications:
   email:
     on_success: never
     on_failure: always
+env:
+  - PACKAGE_VERSION=1.0.$TRAVIS_BUILD_NUMBER
 script:
-  - dotnet build src/Badger.Common.sln
-  - dotnet test src/Badger.Common.Tests/Badger.Common.Tests.csproj
+  - dotnet build src/Badger.Common.sln -c Release 
+  - dotnet test src/Badger.Common.Tests/Badger.Common.Tests.csproj -c Release
+  - dotnet pack src/Badger.Common/Badger.Common.csproj -c Release -o nuget -p:PackageVersion=$PACKAGE_VERSION -p:FileVersion=$PACKAGE_VERSION
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: dotnet nuget push src/Badger.Common/nuget/Badger.Common.*.nupkg -k $NUGET_KEY -s https://nuget.org
+  on:
+    branch: master

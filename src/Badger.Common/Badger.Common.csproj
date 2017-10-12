@@ -2,7 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.1</LangVersion> 
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackageId>Badger.Common</PackageId>
+    <AssemblyName>Badger.Common</AssemblyName>
+    <Description>A collection of useful utilities</Description>
+    <Authors>Tim Barker</Authors>
+    <PackageProjectUrl>https://github.com/timbarker/Badger.Common</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/timbarker/Badger.Common/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
 </Project>
