@@ -125,11 +125,94 @@ result.AsEnumerable();
 
 ## Disposable
 
-Wraps an action creating an IDisposable
+Helpers for creating IDisposable objects
 
 ```csharp
+// Wraps an action in a disposable
 IDisposable disposable = Disposable.From(() => Console.WriteLine("Disposing"));
 
 // prints "Disposing"
 disposable.Dispose();
+```
+
+```csharp
+// Creates a composite disposable that disposes all the disposables passed into it
+IDisposable disposable = Disposable.From(disposable1, disposable2);
+
+// calls disposable1.Dispose() and disposable2.Dispose()
+disposable.Dispose()
+```
+
+## EventBus
+
+A simple thread safe event bus
+
+```csharp
+
+// create a new bus
+var bus = new EventBus();
+
+// subscribe to "string" events
+bus.Subscribe<string>(s => Console.WriteLine(s));
+
+// calls all the "string" subscriptions
+bus.Publish("Hello World");
+```
+
+Any type can be rasied on the bus
+
+```csharp
+class MyEvent
+{
+    // ...
+}
+
+bus.Subscribe<MyEvent>(e => Console.WriteLine("MyEvent raised"));
+
+bus.Publish(new MyEvent());
+```
+
+Subscriptions are managed via a subscription object returned from the Subscribe method
+
+```csharp
+// a subscription object is returned when subscribing
+var subscription = bus.Subscribe<int>(i => Console.WriteLine(i));
+
+// to stop subscribing call Dispose
+subscription.Dispose();
+
+// disposed subscription is not called
+bus.Publish(42);
+
+```
+
+An object can be subscribed to the bus and any methods with the Subscribe attribute that accept one argument and return void will be subscribed
+
+```csharp
+
+class MyObject
+{
+    [Subscribe]
+    public void HandleStrings(string s)
+    {
+        Console.WriteLine(s);
+    }
+
+    [Subscribe]
+    private void AlsoHandleInts(int i)
+    {
+        Console.WriteLine(i)
+    }
+}
+
+var myObject = new MyObject();
+
+var subscription = bus.Subscribe(myObject);
+
+// invokes myObject.HandleStrings()
+bus.Publish("badger");
+
+// invokes myObject.AlsoHandleInts()
+bus.Publish(42);
+
 ```

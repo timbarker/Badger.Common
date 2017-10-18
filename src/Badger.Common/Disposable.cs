@@ -16,6 +16,17 @@ namespace Badger.Common
             return new Disposable(dispose);
         }
 
+        public static IDisposable From(params IDisposable[] disposables)
+        {
+            return From(() => 
+            {
+                foreach (var disposable in disposables)
+                {
+                    disposable.Dispose();
+                }
+            });
+        }
+
         void IDisposable.Dispose()
         {
             dispose?.Invoke();

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <LangVersion>7.1</LangVersion> 
     <PackageVersion>1.0.0</PackageVersion>
     <PackageId>Badger.Common</PackageId>
@@ -11,5 +11,11 @@
     <PackageProjectUrl>https://github.com/timbarker/Badger.Common</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/timbarker/Badger.Common/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+  </ItemGroup>
 
 </Project>

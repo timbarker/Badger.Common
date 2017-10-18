@@ -33,5 +33,19 @@ namespace Badger.Common.Tests
                 invokedCount.Should().Be(1);
             }
         }
+
+        public class WhenAggregatingDisposables
+        {
+            [Fact]
+            public void ThenTheDisposblesAreAllCalled()
+            {
+                int invokedCount = 0;
+                var disposbale = Disposable.From(Disposable.From(() => invokedCount++), Disposable.From(() => invokedCount++));
+
+                disposbale.Dispose();
+
+                invokedCount.Should().Be(2);
+            }
+        }
     }
 }
