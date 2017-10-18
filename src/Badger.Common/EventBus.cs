@@ -6,17 +6,16 @@ using System.Reflection;
 
 namespace Badger.Common
 {
-
-    public class EventBus : IEventBus
+    public sealed class EventBus : IEventBus
     {
-        interface IHandler 
+        private interface IHandler 
         {
             void Call(object @event);
 
             Type Type { get;}
         }
 
-        class ActionHandler<T> : IHandler
+        private sealed class ActionHandler<T> : IHandler
         {
             private Action<T> _handler;
 
@@ -32,7 +31,7 @@ namespace Badger.Common
             }
         }
 
-        class MethodHandler : IHandler
+        private sealed class MethodHandler : IHandler
         {
             private readonly object _instance;
             private readonly MethodInfo _method;
@@ -56,6 +55,20 @@ namespace Badger.Common
         {
             _eventHandlers = new ConcurrentDictionary<Type, ImmutableList<IHandler>>();
         }
+
+        public sealed class ErrorArgs : EventArgs
+        {
+            public ErrorArgs(object @event, Exception exception)
+            {
+                Event = @event;
+                Exception = exception;
+            }
+
+            public object Event { get; }
+            public Exception Exception { get; }
+        }
+
+        public event EventHandler<ErrorArgs> Error;
 
         public IDisposable Subscribe(object o)
         {
@@ -98,9 +111,24 @@ namespace Badger.Common
 
         public void Publish<T>(T @event)
         {
-            if (!_eventHandlers.TryGetValue(typeof(T), out var handlers)) return;
+            if (!_eventHandlers.TryGetValue(typeof(T), out var handlers) || handlers.IsEmpty) 
+            {
+                if (typeof (T) != typeof(DeadEvent))
+                    Publish(new DeadEvent(@event));
+                return;
+            } 
 
-            handlers.ForEach(h => h.Call(@event));
+            handlers.ForEach(h => 
+            {
+                try 
+                {
+                    h.Call(@event);
+                } 
+                catch (Exception ex)
+                {
+                    Error?.Invoke(this, new ErrorArgs(@event, ex));
+                }
+            });
         }
     }
 }

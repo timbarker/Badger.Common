@@ -216,3 +216,30 @@ bus.Publish("badger");
 bus.Publish(42);
 
 ```
+
+If there is no subscriptions to an event then the DeadEvent will be raised on the bus
+```csharp
+var bus = new EventBus();
+
+bus.Subscribe<DeadEvent>(e => Console.WriteLine(e.Event));
+
+// causes DeadEvent to be raised with this event on the Event property
+bus.Publish("badger");
+
+```
+
+If there is an exception in a subscription then the Error event handler on the bus will be invoked.
+An exception in one subscriber does not stop other subscribers from being invoked and the exception is
+not propagated back to the Publish call
+
+```csharp
+
+var bus = new EventBus();
+bus.Error += (s, e) => Console.WriteLine("Error: " + ex.Message);
+
+bus.Subscribe<string>(s => throw new Exception(s));
+bus.Subscribe<string>(s => Console.WriteLine(s));
+
+// this will invoke the throwing subscriber and cause the Error event to be raised
+// the second string subscriber will still be invoked
+bus.Publish("badger");

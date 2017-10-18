@@ -141,6 +141,102 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenEventIsNotHandled
+        {
+            private DeadEvent _deadEvent;
+            public WhenEventIsNotHandled()
+            {
+                var bus = new EventBus();
+
+                bus.Subscribe<DeadEvent>(e => _deadEvent = e);
+
+                bus.Publish("badger");
+            }
+
+            [Fact]
+            public void ThenADeadEventIsPublished()
+            {
+                _deadEvent.Should().NotBeNull();
+                _deadEvent.Event.Should().Equals("badger");
+            }
+        }
+
+        public class WhenAPreviouslySubscribedEventIsNotHandled
+        {
+            private DeadEvent _deadEvent;
+            public WhenAPreviouslySubscribedEventIsNotHandled()
+            {
+                var bus = new EventBus();
+
+                bus.Subscribe<DeadEvent>(e => _deadEvent = e);
+                bus.Subscribe<string>(_ => {}).Dispose();
+
+                bus.Publish("badger");
+            }
+
+            [Fact]
+            public void ThenADeadEventIsPublished()
+            {
+                _deadEvent.Should().NotBeNull();
+                _deadEvent.Event.Should().Be("badger");
+            }
+        }
+
+        public class WhenAnExceptionIsThrownFromASubscription
+        {
+            private List<string> raisedEvents = new List<string>();
+            private EventBus.ErrorArgs errorEvent; 
+            
+            public WhenAnExceptionIsThrownFromASubscription()
+            {
+                var bus = new EventBus();
+
+                bus.Error += (s, e) => errorEvent = e;
+
+                bus.Subscribe<string>(s => raisedEvents.Add("Before " + s));  
+                bus.Subscribe<string>(s => throw new Exception("Error: " + s));
+                bus.Subscribe<string>(s => raisedEvents.Add("After " + s));  
+        
+                bus.Publish("Badger");
+            }
+
+            [Fact]
+            public void ThenTheErrorEventIsRaised()
+            {
+                errorEvent.Should().NotBeNull();
+                errorEvent.Event.Should().Be("Badger");
+                errorEvent.Exception.Message.Should().Be("Error: Badger");
+            }
+
+            [Fact]
+            public void TheOtherSubscribersAreStillInvoked()
+            {
+                raisedEvents.Should().Equal("Before Badger", "After Badger");
+            }
+        }
+
+        public class WhenAnExceptionIsThrownFromDeadEventSubscirption
+        {
+            private EventBus.ErrorArgs errorEvent; 
+            public WhenAnExceptionIsThrownFromDeadEventSubscirption()
+            {
+                var bus = new EventBus();
+                bus.Error += (s, e) => errorEvent = e;
+
+                bus.Subscribe<DeadEvent>(e => throw new Exception("Error: " + e.Event));
+                
+                bus.Publish("Badger");
+            }
+
+            [Fact]
+            public void ThenTheErrorEventIsRaised()
+            {
+                errorEvent.Should().NotBeNull();
+                errorEvent.Event.As<DeadEvent>().Event.Should().Be("Badger");
+                errorEvent.Exception.Message.Should().Be("Error: Badger");
+            }
+        }
+
         public class WhenSubscribingAnObject
         {
             private readonly MyObject _object;
