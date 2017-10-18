@@ -221,7 +221,7 @@ If there is no subscriptions to an event then the DeadEvent will be raised on th
 ```csharp
 var bus = new EventBus();
 
-bus.Subscribe<DeadEvent>(e => Console.WriteLine(e.Event));
+bus.Subscribe<EventBus.DeadEvent>(e => Console.WriteLine(e.Event));
 
 // causes DeadEvent to be raised with this event on the Event property
 bus.Publish("badger");

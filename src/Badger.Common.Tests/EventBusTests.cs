@@ -143,12 +143,12 @@ namespace Badger.Common.Tests
 
         public class WhenEventIsNotHandled
         {
-            private DeadEvent _deadEvent;
+            private EventBus.DeadEvent _deadEvent;
             public WhenEventIsNotHandled()
             {
                 var bus = new EventBus();
 
-                bus.Subscribe<DeadEvent>(e => _deadEvent = e);
+                bus.Subscribe<EventBus.DeadEvent>(e => _deadEvent = e);
 
                 bus.Publish("badger");
             }
@@ -163,12 +163,12 @@ namespace Badger.Common.Tests
 
         public class WhenAPreviouslySubscribedEventIsNotHandled
         {
-            private DeadEvent _deadEvent;
+            private EventBus.DeadEvent _deadEvent;
             public WhenAPreviouslySubscribedEventIsNotHandled()
             {
                 var bus = new EventBus();
 
-                bus.Subscribe<DeadEvent>(e => _deadEvent = e);
+                bus.Subscribe<EventBus.DeadEvent>(e => _deadEvent = e);
                 bus.Subscribe<string>(_ => {}).Dispose();
 
                 bus.Publish("badger");
@@ -223,7 +223,7 @@ namespace Badger.Common.Tests
                 var bus = new EventBus();
                 bus.Error += (s, e) => errorEvent = e;
 
-                bus.Subscribe<DeadEvent>(e => throw new Exception("Error: " + e.Event));
+                bus.Subscribe<EventBus.DeadEvent>(e => throw new Exception("Error: " + e.Event));
                 
                 bus.Publish("Badger");
             }
@@ -232,7 +232,7 @@ namespace Badger.Common.Tests
             public void ThenTheErrorEventIsRaised()
             {
                 errorEvent.Should().NotBeNull();
-                errorEvent.Event.As<DeadEvent>().Event.Should().Be("Badger");
+                errorEvent.Event.As<EventBus.DeadEvent>().Event.Should().Be("Badger");
                 errorEvent.Exception.Message.Should().Be("Error: Badger");
             }
         }

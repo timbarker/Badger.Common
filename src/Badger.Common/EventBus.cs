@@ -70,6 +70,16 @@ namespace Badger.Common
 
         public event EventHandler<ErrorArgs> Error;
 
+        public class DeadEvent
+        {
+            public DeadEvent(object @event)
+            {
+                Event = @event;
+            }
+
+            public object Event { get; }
+        }
+
         public IDisposable Subscribe(object o)
         {
             return Disposable.From(o.GetType()
