@@ -123,6 +123,32 @@ var result = Result.Try(() => int.Parse("123"));
 result.AsEnumerable();
 ```
 
+## Extensions to IList<T>
+```csharp
+var list = new List<int> { 1, 2, 3, 4, 5 };
+
+// finds the first value that matches the prdicate. Returns Some if match, else None
+var result = list.FindValue(i => i == 2);
+
+// returns the first result where Some is returned
+var result = list.Pick(i => i == 2 ? Optional.Some("Badger") : Optional.None<string>())
+```
+
+## Extensions to IDictionary<TKey, TValue>
+
+```csharp
+var dictionary = new Dictionary<string, int> { ["Badger"] = 42 };
+
+// gets the value for the key specified. Returns Some if key exists, else None
+var result = dictionary.Find("Badger");
+
+// gets the key for the first key/value that returns true. None is retuned if nothing matched
+var result = dictionary.FindKey((k, v) => k == "Badger" && v == 42);
+
+// returns the first result where Some is returned
+var result = dictionary.Pick((k, v) => k == "Badger" ? Optional.Some(42) : Optional.None<int>());
+```
+
 ## Disposable
 
 Helpers for creating IDisposable objects
