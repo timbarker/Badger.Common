@@ -4,6 +4,15 @@ Set of useful C# utilities
 [![Build Status](https://travis-ci.org/timbarker/Badger.Common.svg?branch=master)](https://travis-ci.org/timbarker/Badger.Common)
 [![Nuget Package](https://img.shields.io/nuget/v/Badger.Common.svg?style=flat)](https://www.nuget.org/packages/Badger.Common/)
 
+## Table of contents
+
+* [Optional](#optional)
+* [Result](#result)
+* [Disposable](#disposable)
+* [Extensions to IList](#extensions-to-ilist)
+* [Extensions to IDictionary](#extensions-to-idictionary)
+* [EventBus](#eventbus)
+
 ## Optional
 
 Wraps a value that may or may not be present. The only way to access the value is to use the methods provided.
@@ -110,7 +119,7 @@ var result = Result.Try(() => int.Parse("123"));
 result.AsEnumerable();
 ```
 
-## Extensions to IList<T>
+## Extensions to IList
 ```csharp
 var list = new List<int> { 1, 2, 3, 4, 5 };
 
@@ -121,7 +130,7 @@ var result = list.FindValue(i => i == 2);
 var result = list.Pick(i => i == 2 ? Optional.Some("Badger") : Optional.None<string>())
 ```
 
-## Extensions to IDictionary<TKey, TValue>
+## Extensions to IDictionary
 
 ```csharp
 var dictionary = new Dictionary<string, int> { ["Badger"] = 42 };
