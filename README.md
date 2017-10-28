@@ -4,19 +4,6 @@ Set of useful C# utilities
 [![Build Status](https://travis-ci.org/timbarker/Badger.Common.svg?branch=master)](https://travis-ci.org/timbarker/Badger.Common)
 [![Nuget Package](https://img.shields.io/nuget/v/Badger.Common.svg?style=flat)](https://www.nuget.org/packages/Badger.Common/)
 
-## SystemTime
-
-Useful in test code to freeze time. Normally the test setup would freeze the time and the teardown would dispose the result returned from calling Freeze. Application code would use SystemTime.UtcNow instead of DateTime.UtcNow.
-
-```csharp
-// Freeze time now (or optionally specify the DateTime to freeze at)
-using (SystemTime.Freeze())
-{
-    // Always returns the same value until the using block exit
-    Console.WriteLine(SystemTime.UtcNow); 
-}
-```
-
 ## Optional
 
 Wraps a value that may or may not be present. The only way to access the value is to use the methods provided.

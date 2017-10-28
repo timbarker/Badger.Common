@@ -11,6 +11,14 @@
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "test",
+            "args": [
+                "${workspaceRoot}/src/Badger.Common.Tests/Badger.Common.Tests.csproj"
+            ],
+            "isTestCommand": true,
+            "problemMatcher": "$msCompile"
         }
     ]
 }
