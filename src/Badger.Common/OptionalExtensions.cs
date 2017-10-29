@@ -46,6 +46,12 @@ namespace Badger.Common
             return optional;
         }
 
+        public static R Match<T, R>(this Optional<T> optional, Func<T, R> some, Func<R> none)
+        {
+            if (optional.HasValue) return some(optional.Value);
+            return none();
+        }
+
         public static T? ToNullable<T>(this Optional<T> optional) where T : struct
         {
             if (optional.HasValue) return optional.Value;

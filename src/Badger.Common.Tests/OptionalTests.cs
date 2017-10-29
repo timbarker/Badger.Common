@@ -233,6 +233,24 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenMatching
+        {
+            private readonly int _result;
+
+            public WhenMatching()
+            {
+                _result = Optional.Some(42)
+                                  .Match(some: v => v, 
+                                         none: () => 0);
+            }
+
+            [Fact]
+            public void ThenTheOkFuncIsCalled()
+            {
+                _result.Should().Be(42);
+            }
+        }
+
         public class WhenConvertingToNullable
         {
             private readonly int? result;
@@ -418,6 +436,24 @@ namespace Badger.Common.Tests
             public void TheReturnedOptionShouldBeTheSame()
             {
                 optional.WhenNone(() => { }).Should().BeSameAs(optional);
+            }
+        }
+
+        public class WhenMatching
+        {
+            private readonly int _result;
+
+            public WhenMatching()
+            {
+                _result = Optional.None<int>()
+                                  .Match(some: v => v, 
+                                         none: () => 0);
+            }
+
+            [Fact]
+            public void ThenTheNoneFuncIsCalled()
+            {
+                _result.Should().Be(0);
             }
         }
 

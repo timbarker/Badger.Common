@@ -44,6 +44,9 @@ optional.FlatMap(v => Divide(250, v));
 // returns Some only if the predicate holds true and result is not None, else it results None
 optional.Filter(v => v % 2 == 0); 
 
+// returns the result of calling the some function when Some, or the none function when None
+optional.Match(some: v => v, none: () => 0);
+
 // invokes the action supplied if the result is not None
 optional.WhenSome(r => Console.WriteLine(r));
 
@@ -87,6 +90,9 @@ result.FlatMap(r => Divide(250, r));
 
 // changes the error string to "Whoops" if result is an Error
 result.MapError(e => "Whoops");
+
+// returns the result of calling the ok function when Ok, or the error function when Error
+optional.Match(ok: v => v, error: e => 0);
 
 // invokes the supplied action if the result is Ok
 result.WhenOk(s => Console.WriteLine(s));

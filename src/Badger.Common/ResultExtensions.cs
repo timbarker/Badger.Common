@@ -34,6 +34,13 @@ namespace Badger.Common
             return result;
         }
 
+        public static R Match<T, TError, R>(this Result<T, TError> result, Func<T, R> ok, Func<TError, R> error)
+        {
+            if (result.HasValue) return ok(result.Value);
+
+            return error(result.Error);
+        }
+
         public static T ValueOrThrow<T, TError>(this Result<T, TError> result) where TError : Exception
         {
             if (!result.HasValue) throw result.Error;

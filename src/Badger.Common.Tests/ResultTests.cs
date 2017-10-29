@@ -185,6 +185,24 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenMatching
+        {
+            private readonly int _result;
+            
+            public WhenMatching()
+            {
+                _result = Result.Ok<int, string>(42)
+                                .Match(ok: v => v, 
+                                       error: e => 0);
+            }
+
+            [Fact]
+            public void ThenTheOkMatchShouldBeCalled()
+            {
+                _result.Should().Be(42);
+            }
+        }
+
         public class WhenValueOrThrow
         {
             private readonly Result<int, Exception> result;
@@ -432,6 +450,24 @@ namespace Badger.Common.Tests
             public void TheReturnedResultShouldBeTheSame()
             {
                 result.WhenError(_ => { }).Should().BeSameAs(result);
+            }
+        }
+
+        public class WhenMatching
+        {
+            private readonly int _result;
+            
+            public WhenMatching()
+            {
+                _result = Result.Error<int, string>("badger")
+                                .Match(ok: v => v, 
+                                       error: e => 0);
+            }
+
+            [Fact]
+            public void ThenTheErrorMatchShouldBeCalled()
+            {
+                _result.Should().Be(0);
             }
         }
 
