@@ -113,6 +113,38 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenApplyingSomeFunc
+        {
+            private readonly Result<int, string> _result;
+
+            public WhenApplyingSomeFunc()
+            {
+                _result = Result.Ok<int, string>(42).Apply(Result.Ok<Func<int, int>, string>(f => f));
+            }
+
+            [Fact]
+            public void ThenTheResultShouldBeCorrect()
+            {
+                _result.AssertOk(42);
+            }
+        }
+
+        public class WhenApplyingErrorFunc
+        {
+            private readonly Result<int, string> _result;
+
+            public WhenApplyingErrorFunc()
+            {
+                _result = Result.Ok<int, string>(42).Apply(Result.Error<Func<int, int>, string>("badger"));
+            }
+
+            [Fact]
+            public void ThenTheResultShouldBeCorrect()
+            {
+                _result.AssertError("badger");
+            }
+        }
+
         public class WhenMappingError
         {
             private readonly Result<int, string> result;
@@ -378,6 +410,38 @@ namespace Badger.Common.Tests
             public void ThenTheResultShouldNotHaveAValue()
             {
                 result.HasValue.Should().BeFalse();
+            }
+        }
+
+                public class WhenApplyingSomeFunc
+        {
+            private readonly Result<int, string> _result;
+
+            public WhenApplyingSomeFunc()
+            {
+                _result = Result.Error<int, string>("badger").Apply(Result.Ok<Func<int, int>, string>(f => f));
+            }
+
+            [Fact]
+            public void ThenTheResultShouldBeCorrect()
+            {
+                _result.AssertError("badger");
+            }
+        }
+
+        public class WhenApplyingErrorFunc
+        {
+            private readonly Result<int, string> _result;
+
+            public WhenApplyingErrorFunc()
+            {
+                _result = Result.Error<int, string>("badger").Apply(Result.Error<Func<int, int>, string>("badger func"));
+            }
+
+            [Fact]
+            public void ThenTheResultShouldBeCorrect()
+            {
+                _result.AssertError("badger func");
             }
         }
 

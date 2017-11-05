@@ -52,6 +52,11 @@ namespace Badger.Common
             internal override T Value => throw new InvalidOperationException("None does not have a value");
 
             public override bool HasValue => false;
+
+            public override string ToString()
+            {
+                return "None";
+            }
         }
     }
 }

@@ -23,8 +23,7 @@ Optional<int> Divide(int a, int b)
 {
     if (b == 0) 
         return Optional.None<int>();
-    else 
-        return Optional.Some(a / b);
+    return Optional.Some(a / b);
 }
 
 var optional = Divide(100, 2);
@@ -66,6 +65,52 @@ var optional = Optional.FromNullable(x);
 // converts to an IEnumerable<T>, has one item if Some, else is empty
 optional.AsEnumerable();
 
+// using Apply:
+class Person
+{
+    public string FirstName { get; }
+    public string LastName { get; }
+    public DateTime Dob { get; }
+
+    private Person(string firstName, string lastName, DateTime dob)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Dob = dob;
+    }
+
+    public static readonly Func<string, string, DateTime, Person> Create = (f, l, dob) => new Person(f, l, dob);
+}
+
+Optional<string> ValidateFirstName(string firstName) 
+{
+    if (string.IsNullOrWhiteSpace(firstName)) return Optional.None<string>();
+
+    Optional.Some(firstName);   
+}
+
+Optional<string> ValidateLastName(string lastName) 
+{
+    if (string.IsNullOrWhiteSpace(lastName)) return Optional.None<string>();
+
+    Optional.Some(lastName);   
+}
+
+Optional<DateTime> ValidateDob(DateTime dob)
+{
+    if (dob > DateTime.UtcNow) return Optional.None<DateTime>();
+
+    Optional.Some(dob);
+}
+
+// creates a person object only if all the parameters pass validation, else returns None
+Optional<Person> Create(string firstName, string lastName, DateTime dob)
+{
+    return ValidateDob(dob)
+            .Apply(ValidateLastName(lastName)
+                .Apply(ValidateFirstName(firstName)
+                    .Map(Person.Create.Curry())))
+}
 ```
 
 ## Result
@@ -123,6 +168,53 @@ var result = Result.Try(() => int.Parse("123"));
 
 // converts to an IEnumerable<T>, has one item if Ok, else is empty
 result.AsEnumerable();
+
+// apply exampler
+class Person
+{
+    public string FirstName { get; }
+    public string LastName { get; }
+    public DateTime Dob { get; }
+
+    private Person(string firstName, string lastName, DateTime dob)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Dob = dob;
+    }
+    public static readonly Func<string, string, DateTime, Person> Create = (f, l, dob) => new Person(f, l, dob);
+}
+
+Result<string, string> ValidateFirstName(string firstName) 
+{
+    if (string.IsNullOrWhiteSpace(firstName)) return Result.Error<string, string>("First name is empty");
+
+    else return Result.Ok<string, string>(firstName); 
+}
+
+Result<string, string> ValidateLastName(string lastName) 
+{
+    if (string.IsNullOrWhiteSpace(lastName)) return Result.Error<string, string>("Last name is empty");
+
+    else return Result.Ok<string, string>(lastName);  
+}
+
+Result<DateTime, string> ValidateDob(DateTime dob)
+{
+    if (dob > DateTime.UtcNow) return Result.Error<DateTime, string>("date of birth is in the future");
+
+    return Result.Ok<DateTime, string>(dob);
+}
+
+// creates a person object only if all the parameters pass validation, else returns the first validation error
+Result<Person, string> Create(string firstName, string lastName, DateTime dob)
+{
+    return ValidateDob(dob)
+            .Apply(ValidateLastName(lastName)
+                .Apply(ValidateFirstName(firstName)
+                    .Map(Person.Create.Curry())));
+}
+
 ```
 
 ## Extensions to IList

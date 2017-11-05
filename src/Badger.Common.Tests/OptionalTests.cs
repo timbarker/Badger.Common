@@ -151,6 +151,38 @@ namespace Badger.Common.Tests
             }
         }
 
+        public class WhenApplyingSomeFunc
+        {
+            private readonly Optional<int> _result;
+
+            public WhenApplyingSomeFunc()
+            {
+                _result = Optional.Some(42).Apply(Optional.Some<Func<int, int>>(f => f));
+            }
+
+            [Fact]
+            public void ThenTheResultIsCorect()
+            {
+                _result.AssertSome(42);
+            }
+        }
+
+        public class WhenApplyingNone
+        {
+            private readonly Optional<int> _result;
+
+            public WhenApplyingNone()
+            {
+                _result = Optional.Some(42).Apply(Optional.None<Func<int, int>>());
+            }
+
+            [Fact]
+            public void ThenTheResultIsCorect()
+            {
+                _result.HasValue.Should().BeFalse();
+            }
+        }
+
         public class WhenFilteringIn
         {
             private readonly Optional<int> result;
@@ -354,6 +386,38 @@ namespace Badger.Common.Tests
             public void ThenTheMapResultIsCorrect()
             {
                 result.HasValue.Should().BeFalse();
+            }
+        }
+
+        public class WhenApplyingSomeFunc
+        {
+            private readonly Optional<int> _result;
+
+            public WhenApplyingSomeFunc()
+            {
+                _result = Optional.None<int>().Apply(Optional.Some<Func<int, int>>(f => f));
+            }
+
+            [Fact]
+            public void ThenTheResultIsCorect()
+            {
+                _result.HasValue.Should().BeFalse();
+            }
+        }
+
+        public class WhenApplyingNone
+        {
+            private readonly Optional<int> _result;
+
+            public WhenApplyingNone()
+            {
+                _result = Optional.None<int>().Apply(Optional.None<Func<int, int>>());
+            }
+
+            [Fact]
+            public void ThenTheResultIsCorect()
+            {
+                _result.HasValue.Should().BeFalse();
             }
         }
 

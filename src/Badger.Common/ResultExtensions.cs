@@ -15,6 +15,17 @@ namespace Badger.Common
             return result.FlatMap(r => Result.Ok<U, TError>(mapper(r)));
         }
 
+        public static Result<U, TError> Apply<T, TError, U>(this Result<T, TError> result, Result<Func<T, U>, TError> applier)
+        {
+            if (result.HasValue && applier.HasValue)
+                return Result.Ok<U, TError>(applier.Value(result.Value));
+
+            if (!applier.HasValue)
+                return Result.Error<U, TError>(applier.Error);
+
+            return Result.Error<U, TError>(result.Error);
+        }
+
         public static Result<T, UError> MapError<T, TError, UError>(this Result<T, TError> result, Func<TError, UError> mapper)
         {
             return !result.HasValue ? Result.Error<T, UError>(mapper(result.Error)) : Result.Ok<T, UError>(result.Value);

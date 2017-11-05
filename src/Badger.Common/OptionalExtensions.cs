@@ -27,6 +27,14 @@ namespace Badger.Common
             return optional.FlatMap(t => Optional.Some(mapper(t)));
         }
 
+        public static Optional<U> Apply<T, U>(this Optional<T> optional, Optional<Func<T, U>> applier)
+        {
+            if (optional.HasValue && applier.HasValue)
+                return Optional.Some(applier.Value(optional.Value));
+            
+            return Optional.None<U>();
+        }
+
         public static Optional<T> Filter<T>(this Optional<T> optional, Predicate<T> filter)
         {
             return optional.FlatMap(t => filter(t) ? Optional.Some(t) : Optional.None<T>());
