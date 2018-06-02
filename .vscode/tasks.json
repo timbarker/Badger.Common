@@ -1,24 +1,33 @@
 {
-    "version": "0.1.0",
-    "command": "dotnet",
-    "isShellCommand": true,
-    "args": [],
+    "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "build",
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
             "args": [
-                "${workspaceRoot}/src/Badger.Common.Tests/Badger.Common.Tests.csproj"
+                "build",
+                "${workspaceFolder}/src/Badger.Common.sln"
             ],
-            "isBuildCommand": true,
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
-            "taskName": "test",
+            "label": "tests",
+            "command": "dotnet",
+            "type": "process",
             "args": [
-                "${workspaceRoot}/src/Badger.Common.Tests/Badger.Common.Tests.csproj"
+                "test",
+                "${workspaceFolder}/src/Badger.Common.Tests/Badger.Common.Tests.csproj"
             ],
-            "isTestCommand": true,
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
         }
     ]
 }
