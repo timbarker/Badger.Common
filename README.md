@@ -8,6 +8,7 @@ Set of useful C# utilities
 
 * [Optional](#optional)
 * [Result](#result)
+* [Validation](#validation)
 * [Disposable](#disposable)
 * [Extensions to IList](#extensions-to-ilist)
 * [Extensions to IDictionary](#extensions-to-idictionary)
@@ -217,7 +218,7 @@ Result<Person, string> Create(string firstName, string lastName, DateTime dob)
 
 ```
 
-## Validator
+## Validation
 Wraps a successful validation or a list of validation errors, collects validation errors when applied.
 This is similar to Result, but Result will only hold one error and stops on the first error, Validation collates errors as all validations are applied
 
