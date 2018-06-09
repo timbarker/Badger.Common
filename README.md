@@ -127,7 +127,7 @@ Result<int, string> Divide(int a, int b)
 
 var result = Divide(100, 2);
 
-// multiplies the result by 100 only if result is Ok
+// multiplies the result by 2 only if result is Ok
 result.Map(r => r * 2);
 
 // calls Divide again only if result is Ok
@@ -214,6 +214,100 @@ Result<Person, string> Create(string firstName, string lastName, DateTime dob)
                 .Apply(ValidateFirstName(firstName)
                     .Map(Person.Create.Curry())));
 }
+
+```
+
+## Validator
+Wraps a successful validation or a list of validation errors, collects validation errors when applied.
+This is similar to Result, but Result will only hold one error and stops on the first error, Validation collates errors as all validations are applied
+
+```csharp
+Validation<int, string> InRange(int a, int min, int max)
+{
+    if (a < min || a >= max) 
+        return Validation.Error<int, string>($"{a} is outside of range {min} to {max}");
+
+    return Validation.Success<int, string>(a);
+}
+
+var validated = InRange(20, 0, 100);
+
+// multiplies the validated value by 2 only if Success
+validated.Map(r => r * 2);
+
+// calls InRange again only if result is Success
+validated.FlatMap(r => InRange(r, 0, 25));
+
+// changes the error string to "Whoops" if result is an Error
+result.MapError(e => "Whoops");
+
+// returns the result of calling the success function when Success, or the error function when Error
+optional.Match(success: v => v, error: e => 0);
+
+// invokes the supplied action if the result is Success
+result.WhenSuccess(s => Console.WriteLine(s));
+
+// invokes the supplied action if the result is an Error
+result.WhenError(e => Console.WriteLine(e));
+
+// example chaining validators and constructing a validated object
+
+class Person
+{
+    public string FirstName { get; }
+    public string LastName { get; }
+    public DateTime Dob { get; }
+
+    private Person(string firstName, string lastName, DateTime dob)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Dob = dob;
+    }
+    public static readonly Func<string, string, DateTime, Person> Create = (f, l, dob) => new Person(f, l, dob);
+}
+
+Validation<string, string> ValidateFirstName(string firstName)
+{
+    if (string.IsNullOrWhiteSpace(firstName)) return Validation.Error<string, string>("First name is empty");
+
+    else return Validation.Success<string, string>(firstName);
+}
+
+Validation<string, string> ValidateLastName(string lastName)
+{
+    if (string.IsNullOrWhiteSpace(lastName)) return Validation.Error<string, string>("Last name is empty");
+
+    else return Validation.Success<string, string>(lastName);
+}
+
+Validation<DateTime, string> ValidateDob(DateTime dob)
+{
+    if (dob > DateTime.UtcNow) return Validation.Error<DateTime, string>("date of birth is in the future");
+
+    return Validation.Success<DateTime, string>(dob);
+}
+
+Validation<Person, string> Create(string firstName, string lastName, DateTime dob)
+{
+    return ValidateDob(dob)
+            .Apply(ValidateLastName(lastName)
+                .Apply(ValidateFirstName(firstName)
+                    .Map(Person.Create.Curry())));
+}
+
+// creates a Success value with a Person object as all validators were Success
+var successfullyValidatedPerson = Create("Joe", "Bloggs", new DateTime(2000, 1, 1));
+
+// did not create a Person object and all validation error values are collated
+var unsuccessfullyValidatedPerson = Create("", "", new DateTime(3000, 1, 1));
+
+// prints out "First name is empty" "Last name is empty" "date of birth is in the future"
+unsuccessfullyValidatedPerson.WhenError(errors => 
+{
+    foreach (var error in errors) 
+        System.Console.WriteLine(error);
+});
 
 ```
 
