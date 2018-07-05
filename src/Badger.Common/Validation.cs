@@ -17,9 +17,9 @@ namespace Badger.Common
 
     public static class Validation
     {
-        private class SuccessValidator<T, TError> : Validation<T, TError>
+        private class SuccessValidation<T, TError> : Validation<T, TError>
         {
-            public SuccessValidator(T value)
+            public SuccessValidation(T value)
             {
                 this.Value = value;
             }
@@ -31,33 +31,33 @@ namespace Badger.Common
             internal override IEnumerable<TError> Errors => Enumerable.Empty<TError>();
         }
 
-        private class ErrorValidator<T, TError> : Validation<T, TError>
+        private class ErrorValidation<T, TError> : Validation<T, TError>
         {
-            public ErrorValidator(IEnumerable<TError> errors)
+            public ErrorValidation(IEnumerable<TError> errors)
             {
                 Errors = errors.ToArray();
             }
 
             public override bool Success => false;
 
-            internal override T Value => throw new InvalidOperationException();
+            internal override T Value => throw new InvalidOperationException("Value can't be read on an error");
 
             internal override IEnumerable<TError> Errors { get; }
         }
 
         public static Validation<T, TError> Success<T, TError>(T ok)
         {
-            return new SuccessValidator<T, TError>(ok);
+            return new SuccessValidation<T, TError>(ok);
         }
 
         public static Validation<T, TError> Error<T, TError>(IEnumerable<TError> errors)
         {
-            return new ErrorValidator<T, TError>(errors);
+            return new ErrorValidation<T, TError>(errors);
         }
 
         public static Validation<T, TError> Error<T, TError>(TError error)
         {
-            return new ErrorValidator<T, TError>(new[] { error });
+            return new ErrorValidation<T, TError>(new[] { error });
         }
     }
 }
